@@ -1,6 +1,7 @@
 import './styles.css';
 import { load, save } from './store.js';
-import { renderToday } from './views/today.js';
+import { renderHealth } from './views/health.js';
+import { renderTrain } from './views/train.js';
 import { renderWeek } from './views/week.js';
 import { renderProgress } from './views/progress.js';
 import { renderData } from './views/data.js';
@@ -18,19 +19,24 @@ const ctx = {
 };
 
 const routes = {
-  '#/today': renderToday,
-  '#/week': renderWeek,
+  '#/health': renderHealth,
+  '#/train': renderTrain,
+  '#/train/week': renderWeek,
   '#/progress': renderProgress,
   '#/data': renderData,
 };
 
+// old bookmarks/home-screen installs from v1
+const redirects = { '#/today': '#/train', '#/week': '#/train/week' };
+
 function render() {
-  const hash = routes[location.hash] ? location.hash : '#/today';
+  let hash = redirects[location.hash] || location.hash;
+  if (!routes[hash]) hash = '#/train';
   const view = document.getElementById('view');
   view.innerHTML = '';
   routes[hash](view, ctx);
   document.querySelectorAll('#nav a').forEach((a) => {
-    a.classList.toggle('active', a.dataset.route === hash);
+    a.classList.toggle('active', hash.startsWith(a.dataset.route));
   });
   window.scrollTo(0, 0);
 }

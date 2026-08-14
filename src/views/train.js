@@ -1,43 +1,55 @@
+// TRAIN face — the daily planner: programmed session + flexible extra slots.
+// Reads Health data (sleep) to adjust the day's guidance.
+
 import {
   todayStr, addDays, weekdayOf, weekNumber, phaseFor, PHASE_INFO, DAY_NAMES,
   slotsFor, LIFTS, setsFor, repRange, repTargetLabel, suggestNextWeight,
-  plungeWarning, sparringMode, parseDate,
+  sparringMode, parseDate,
 } from '../program.js';
 import { getDay, getSession, sessionKey, lastSetsFor } from '../store.js';
-import { h, toast, confirmDialog, nowTime } from '../ui.js';
+import { h, toast, nowTime } from '../ui.js';
+import { weekAdherence } from '../grit.js';
 
 function prettyDate(dateStr) {
   const d = parseDate(dateStr);
   return `${DAY_NAMES[d.getDay()]} · ${d.getDate()}/${d.getMonth() + 1}`;
 }
 
-export function renderToday(root, ctx) {
+export function renderTrain(root, ctx) {
   const { doc } = ctx;
-  const date = ctx.state.todayDate ?? todayStr();
+  const date = ctx.state.date ?? todayStr();
   const isToday = date === todayStr();
   const day = getDay(doc, date);
   const week = weekNumber(date, doc.settings.week1Monday);
   const phase = phaseFor(week, doc.settings.phaseOverride);
   const template = slotsFor(date);
+  const adh = weekAdherence(doc, Math.max(1, weekNumber(todayStr(), doc.settings.week1Monday)));
 
   root.append(
     h('div', { class: 'page-head' },
-      h('h1', {}, isToday ? 'Today' : prettyDate(date)),
+      h('h1', {}, isToday ? 'Train' : prettyDate(date)),
       h('div', { class: 'datenav' },
-        h('button', { class: 'iconbtn', 'aria-label': 'Previous day', onclick: () => { ctx.state.todayDate = addDays(date, -1); ctx.refresh(); } }, '‹'),
+        h('button', { class: 'iconbtn', 'aria-label': 'Previous day', onclick: () => { ctx.state.date = addDays(date, -1); ctx.refresh(); } }, '‹'),
         h('button', {
           class: 'iconbtn', style: 'font-size:12px;font-weight:700;padding:0 10px;min-width:64px',
-          onclick: () => { ctx.state.todayDate = null; ctx.refresh(); },
+          onclick: () => { ctx.state.date = null; ctx.refresh(); },
         }, isToday ? prettyDate(date).split(' · ')[1] : 'Today'),
-        h('button', { class: 'iconbtn', 'aria-label': 'Next day', onclick: () => { ctx.state.todayDate = addDays(date, 1); ctx.refresh(); } }, '›'),
+        h('button', { class: 'iconbtn', 'aria-label': 'Next day', onclick: () => { ctx.state.date = addDays(date, 1); ctx.refresh(); } }, '›'),
       ),
     ),
     h('div', { class: 'phase-banner' },
-      h('span', { class: 'pb-week' }, week < 1 ? 'Baseline week' : `Week ${week} · ${PHASE_INFO[phase].label}`),
+      h('span', { class: 'pb-week' },
+        week < 1 ? 'Baseline week' : `Week ${week} · ${PHASE_INFO[phase].label}`,
+        adh.pct != null ? h('span', { style: 'float:right;color:var(--ink-2)' }, `${adh.pct}% wk`) : null),
       h('span', { class: 'pb-cue' }, PHASE_INFO[phase].cue),
     ),
-    habitCard(ctx, date, day),
   );
+
+  // readiness: Train reads Health
+  if (day.sleepHours != null && day.sleepHours < 6 && template.pm?.type === 'lift') {
+    root.append(h('div', { class: 'warn-note', style: 'margin: -4px 2px 12px' }, '⚠︎',
+      `${day.sleepHours}h sleep — show up anyway, but keep weights at last session's numbers and cut the last set if form slips.`));
+  }
 
   // baseline week: the program hasn't started — no programmed lifting yet
   const suppress = (spec) => week < 1 && spec?.type === 'lift';
@@ -49,7 +61,8 @@ export function renderToday(root, ctx) {
       h('p', { class: 'sub' }, `Program starts Monday ${doc.settings.week1Monday.slice(8)}/${doc.settings.week1Monday.slice(5, 7)}. Rest, walk, mobility.`),
     ));
   }
-  root.append(recoveryCard(ctx, date, day));
+
+  root.append(extrasCard(ctx, date, day));
 
   if (date === doc.settings.startDate) {
     const done = !!doc.sessions[sessionKey(date, 'AM')];
@@ -61,43 +74,8 @@ export function renderToday(root, ctx) {
       ),
     ));
   }
-}
 
-// ---------- habit strip ----------
-
-function habitCard(ctx, date, day) {
-  const num = (v) => (v === '' ? null : Number(v));
-  const habit = (label, input) => h('div', { class: 'habit' }, h('label', {}, label), input);
-
-  const weedList = h('div', {});
-  const renderWeed = () => {
-    weedList.innerHTML = '';
-    (day.weed || []).forEach((w, i) => {
-      weedList.append(h('div', { class: 'weed-row' },
-        h('input', { type: 'time', value: w.time, onchange: (e) => { w.time = e.target.value; ctx.save(); } }),
-        h('input', { type: 'text', placeholder: 'note (optional)', value: w.note || '', onchange: (e) => { w.note = e.target.value; ctx.save(); } }),
-        h('button', { class: 'iconbtn', 'aria-label': 'Remove', onclick: () => { day.weed.splice(i, 1); ctx.save(); renderWeed(); } }, '×'),
-      ));
-    });
-  };
-  renderWeed();
-
-  return h('div', { class: 'card' },
-    h('h2', {}, 'Daily log'),
-    h('div', { class: 'habits' },
-      habit('Wake', h('input', { type: 'time', value: day.wake || '', onchange: (e) => { day.wake = e.target.value || null; ctx.save(); } })),
-      habit('Bedtime', h('input', { type: 'time', value: day.bedtime || '', onchange: (e) => { day.bedtime = e.target.value || null; ctx.save(); } })),
-      habit('Sleep h', h('input', { type: 'number', inputmode: 'decimal', step: '0.5', min: '0', max: '14', placeholder: '7.5', value: day.sleepHours ?? '', onchange: (e) => { day.sleepHours = num(e.target.value); ctx.save(); } })),
-      habit('Weight kg', h('input', { type: 'number', inputmode: 'decimal', step: '0.1', min: '30', max: '200', placeholder: '—', value: day.bodyWeight ?? '', onchange: (e) => { day.bodyWeight = num(e.target.value); ctx.save(); } })),
-    ),
-    weedList,
-    h('div', { style: 'margin-top:10px' },
-      h('button', {
-        class: 'btn btn-ghost', style: 'width:100%',
-        onclick: () => { day.weed.push({ time: nowTime(), note: '' }); ctx.save(); ctx.refresh(); },
-      }, `+ log weed session${day.weed.length ? ` (${day.weed.length} today)` : ''}`),
-    ),
-  );
+  root.append(h('a', { href: '#/train/week', class: 'btn btn-ghost week-link' }, 'View full week & split →'));
 }
 
 // ---------- slots ----------
@@ -109,15 +87,15 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
     onclick: () => { day[doneKey] = !day[doneKey]; ctx.save(); ctx.refresh(); },
   }, day[doneKey] ? '✓ Done' : 'Done?');
 
-  const head = h('div', { class: 'slot-head' },
-    h('div', {},
-      h('div', { class: 'slot-tag' }, slot),
-      h('div', { class: 'slot-label' }, slotTitle(spec, week)),
+  const card = h('div', { class: 'card' },
+    h('div', { class: 'slot-head' },
+      h('div', {},
+        h('div', { class: 'slot-tag' }, slot),
+        h('div', { class: 'slot-label' }, spec.type === 'lift' ? `${LIFTS[spec.lift].title} — lift` : spec.label),
+      ),
+      toggle,
     ),
-    toggle,
   );
-
-  const card = h('div', { class: 'card' }, head);
 
   if (spec.type === 'lift') {
     card.append(liftBody(ctx, date, day, spec.lift, phase));
@@ -139,12 +117,6 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
   return card;
 }
 
-function slotTitle(spec, week) {
-  if (spec.type === 'lift') return `${LIFTS[spec.lift].title} — lift`;
-  if (spec.type === 'sparring') return spec.label;
-  return spec.label;
-}
-
 // ---------- lift logging ----------
 
 function liftBody(ctx, date, day, liftKey, phase) {
@@ -152,11 +124,6 @@ function liftBody(ctx, date, day, liftKey, phase) {
   const tpl = LIFTS[liftKey];
   const body = h('div', {});
   const existing = doc.sessions[sessionKey(date, 'PM')];
-
-  const ensure = () => {
-    const sess = getSession(doc, date, 'PM', liftKey);
-    return sess;
-  };
 
   for (const ex of tpl.exercises) {
     const planned = setsFor(ex, phase);
@@ -189,7 +156,7 @@ function liftBody(ctx, date, day, liftKey, phase) {
       const dBtn = h('button', { class: `set-done${cur.done ? ' on' : ''}`, 'aria-label': `Set ${i + 1} done` }, '✓');
 
       const writeSet = (patch) => {
-        const sess = ensure();
+        const sess = getSession(doc, date, 'PM', liftKey);
         if (!sess.exercises[ex.name]) sess.exercises[ex.name] = [];
         const arr = sess.exercises[ex.name];
         while (arr.length <= i) arr.push({ weight: null, reps: null, done: false });
@@ -242,30 +209,40 @@ function fmtW(w) {
   return String(Number(w.toFixed(1))).replace(/\.0$/, '');
 }
 
-// ---------- recovery ----------
+// ---------- extra sessions (unscheduled: light Muay Thai, a swim, a walk…) ----------
 
-function recoveryCard(ctx, date, day) {
-  const chip = (key, label) => h('button', {
-    class: `rec-chip${day.recovery[key] ? ' on' : ''}`,
-    onclick: async () => {
-      if (key === 'plunge' && !day.recovery.plunge) {
-        const warn = plungeWarning(date);
-        if (warn) {
-          const ok = await confirmDialog({ title: 'Cold plunge on a lifting day?', body: warn });
-          if (!ok) return;
-        }
-      }
-      day.recovery[key] = !day.recovery[key];
-      ctx.save();
-      ctx.refresh();
-    },
-  }, label);
+const EXTRA_TYPES = ['Muay Thai', 'Cardio', 'Mobility', 'Swim', 'Lift', 'Other'];
+
+function extrasCard(ctx, date, day) {
+  const list = h('div', {});
+  const render = () => {
+    list.innerHTML = '';
+    (day.extras || []).forEach((x, i) => {
+      const sel = h('select', { class: 'inline-select', onchange: (e) => { x.type = e.target.value; ctx.save(); } });
+      for (const t of EXTRA_TYPES) sel.append(h('option', { value: t, selected: t === x.type }, t));
+      list.append(
+        h('div', { class: 'weed-row' },
+          h('input', { type: 'time', value: x.time, onchange: (e) => { x.time = e.target.value; ctx.save(); } }),
+          sel,
+          h('button', { class: 'iconbtn', 'aria-label': 'Remove', onclick: () => { day.extras.splice(i, 1); ctx.save(); render(); } }, '×'),
+        ),
+        h('div', { class: 'weed-row', style: 'margin-bottom:14px' },
+          h('input', { type: 'number', inputmode: 'numeric', min: '0', step: '5', placeholder: 'min', style: 'flex:0 0 90px', value: x.minutes ?? '', onchange: (e) => { x.minutes = e.target.value === '' ? null : Number(e.target.value); ctx.save(); } }),
+          h('input', { type: 'text', placeholder: 'notes (optional)', value: x.note || '', onchange: (e) => { x.note = e.target.value; ctx.save(); } }),
+        ),
+      );
+    });
+  };
+  render();
 
   return h('div', { class: 'card' },
-    h('h2', {}, 'Recovery'),
-    h('div', { class: 'recovery-chips' }, chip('sauna', '🔥 Sauna'), chip('plunge', '🧊 Cold plunge')),
-    plungeWarning(date) && !day.recovery.plunge
-      ? h('div', { class: 'warn-note' }, '⚠︎', 'Lifting day — skip the plunge (sauna is fine).')
-      : null,
+    h('h2', {}, 'Extra sessions'),
+    list,
+    h('button', {
+      class: 'btn btn-ghost', style: 'width:100%',
+      onclick: () => { day.extras.push({ time: nowTime(), type: 'Muay Thai', minutes: 45, note: '' }); ctx.save(); ctx.refresh(); },
+    }, '+ add extra session'),
+    h('p', { class: 'sub', style: 'margin-top:8px' },
+      'Extras sit on top of the program — keep them light/technical. Fat loss comes from diet + Zone 2, not extra volume.'),
   );
 }

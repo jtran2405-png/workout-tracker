@@ -27,7 +27,8 @@ export function setsCsv(doc) {
 export function daysCsv(doc) {
   const lines = [row([
     'date', 'wake', 'bedtime', 'sleep_hours', 'body_weight',
-    'weed_count', 'weed_times', 'sauna', 'plunge', 'am_done', 'pm_done', 'sparring_notes',
+    'weed_count', 'weed_times', 'protein_hit', 'junk', 'ate_late', 'food_note',
+    'sauna', 'plunge', 'am_done', 'pm_done', 'sparring_notes', 'extras',
   ])];
   const dates = Object.keys(doc.days).sort();
   for (const date of dates) {
@@ -36,8 +37,10 @@ export function daysCsv(doc) {
     lines.push(row([
       date, d.wake ?? '', d.bedtime ?? '', d.sleepHours ?? '', d.bodyWeight ?? '',
       weed.length, weed.map((w) => w.time).join(' '),
+      d.food?.protein ? 1 : 0, d.food?.junk ? 1 : 0, d.food?.late ? 1 : 0, d.food?.note ?? '',
       d.recovery?.sauna ? 1 : 0, d.recovery?.plunge ? 1 : 0,
       d.amDone ? 1 : 0, d.pmDone ? 1 : 0, d.sparringNotes ?? '',
+      (d.extras || []).map((x) => `${x.time} ${x.type}${x.minutes ? ` ${x.minutes}min` : ''}${x.note ? ` (${x.note})` : ''}`).join('; '),
     ]));
   }
   return lines.join('\n') + '\n';

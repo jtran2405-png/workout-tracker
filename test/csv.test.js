@@ -7,6 +7,8 @@ function sampleDoc() {
   doc.days['2026-08-18'] = {
     wake: '06:30', bedtime: '22:45', sleepHours: 7.5, bodyWeight: 78.4,
     weed: [{ time: '21:10', note: 'after dinner' }],
+    extras: [{ time: '17:00', type: 'Muay Thai', minutes: 45, note: 'light drills' }],
+    food: { protein: true, junk: false, late: true, note: 'pho for lunch' },
     recovery: { sauna: true, plunge: false },
     amDone: true, pmDone: true, sparringNotes: null,
   };
@@ -46,8 +48,10 @@ describe('days.csv', () => {
     const csv = daysCsv(sampleDoc());
     const lines = csv.trim().split('\n');
     expect(lines[0]).toContain('date,wake,bedtime,sleep_hours,body_weight,weed_count');
+    expect(lines[0]).toContain('protein_hit,junk,ate_late,food_note');
+    expect(lines[0]).toContain('sparring_notes,extras');
     expect(lines).toHaveLength(2);
-    expect(lines[1]).toBe('2026-08-18,06:30,22:45,7.5,78.4,1,21:10,1,0,1,1,');
+    expect(lines[1]).toBe('2026-08-18,06:30,22:45,7.5,78.4,1,21:10,1,0,1,pho for lunch,1,0,1,1,,17:00 Muay Thai 45min (light drills)');
   });
 });
 

@@ -52,7 +52,7 @@ export function renderWeek(root, ctx) {
 
     grid.append(h('div', {
       class: 'week-day', role: 'button', tabindex: '0', style: 'cursor:pointer',
-      onclick: () => { ctx.state.todayDate = date === today ? null : date; location.hash = '#/today'; },
+      onclick: () => { ctx.state.date = date === today ? null : date; location.hash = '#/train'; },
     },
       h('div', { class: `wd-date${date === today ? ' today' : ''}` },
         h('div', { class: 'wd-name' }, DAY_ABBR[d.getDay()]),
@@ -61,6 +61,11 @@ export function renderWeek(root, ctx) {
       h('div', { class: 'wd-slots' },
         slotLine('AM', tpl.am, day?.amDone),
         slotLine('PM', tpl.pm, day?.pmDone),
+        ...(day?.extras || []).map((x) => h('div', { class: 'wd-slot' },
+          h('span', { class: 'tag' }, '＋'),
+          h('span', { class: 'dot done' }),
+          `${x.type}${x.minutes ? ` · ${x.minutes} min` : ''}`,
+        )),
       ),
     ));
   }

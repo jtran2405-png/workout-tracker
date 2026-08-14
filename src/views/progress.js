@@ -3,8 +3,10 @@ import {
   setsFor, repRange, suggestNextWeight, parseDate,
 } from '../program.js';
 import { historyFor, lastSetsFor } from '../store.js';
-import { h } from '../ui.js';
+import { h, toast } from '../ui.js';
 import { lineChart } from '../chart.js';
+import { currentStreak, weekAdherence } from '../grit.js';
+import { buildCoachReport } from '../coach.js';
 
 function shortDate(dateStr) {
   const d = parseDate(dateStr);
@@ -57,13 +59,41 @@ export function renderProgress(root, ctx) {
     delta || null,
   );
 
+  const streak = currentStreak(doc);
+  const adh = weekAdherence(doc, week);
+
   root.append(h('div', { class: 'stat-tiles' },
+    tile('Streak', `${streak} ${streak === 1 ? 'day' : 'days'}`,
+      h('div', { class: 'st-delta' }, 'no-zero-days keep the chain')),
+    tile('Adherence · wk', adh.pct != null ? `${adh.pct}%` : '—',
+      h('div', { class: `st-delta ${adh.pct != null && adh.pct >= 80 ? 'down' : 'up'}` }, `${adh.done}/${adh.planned} planned slots`)),
     tile('Body weight', latestW != null ? `${latestW} kg` : '—',
       delta != null ? h('div', { class: `st-delta ${delta <= 0 ? 'down' : 'up'}` }, `${delta > 0 ? '+' : ''}${delta.toFixed(1)} kg vs last week`) : null),
     tile('Sleep · 7d avg', avgSleep != null ? `${avgSleep.toFixed(1)} h` : '—',
       avgSleep != null ? h('div', { class: `st-delta ${avgSleep >= 7 ? 'down' : 'up'}` }, avgSleep >= 7 ? 'on target (7h+)' : 'below 7h target') : null),
     tile('Lifts this week', `${liftsDone} / 4`),
     tile('Weed this week', String(weedCount)),
+  ));
+
+  // ---- weekly coach ritual ----
+  root.append(h('div', { class: 'card' },
+    h('h2', {}, 'Coach check-in'),
+    h('p', { class: 'sub', style: 'margin-bottom:10px' },
+      'Sunday night: copy the report, paste it to Claude (/coach). Numbers don’t negotiate.'),
+    h('button', {
+      class: 'btn btn-primary', style: 'width:100%',
+      onclick: async () => {
+        const report = buildCoachReport(doc, week);
+        try {
+          await navigator.clipboard.writeText(report);
+          toast('Coach report copied — paste it to Claude', 'good');
+        } catch {
+          // clipboard can be blocked (older iOS): fall back to share sheet
+          if (navigator.share) navigator.share({ text: report });
+          else toast('Could not copy — try again', 'warn');
+        }
+      },
+    }, '📋 Copy coach report — week ' + week),
   ));
 
   // ---- per-exercise progression ----

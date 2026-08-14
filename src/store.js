@@ -48,13 +48,16 @@ export function getDay(doc, date) {
   if (!doc.days[date]) {
     doc.days[date] = {
       wake: null, bedtime: null, sleepHours: null, bodyWeight: null,
-      weed: [], recovery: { sauna: false, plunge: false },
+      weed: [], extras: [], food: { protein: false, junk: false, late: false, note: '' },
+      recovery: { sauna: false, plunge: false },
       amDone: false, pmDone: false, sparringNotes: null,
     };
   }
   // backfill fields added after a day record was created
   const d = doc.days[date];
   if (!d.weed) d.weed = [];
+  if (!d.extras) d.extras = [];
+  if (!d.food) d.food = { protein: false, junk: false, late: false, note: '' };
   if (!d.recovery) d.recovery = { sauna: false, plunge: false };
   return d;
 }
