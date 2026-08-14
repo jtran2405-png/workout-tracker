@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__Claude_Browser__javascript_tool",
+  "tool_input_preview": "{\"action\":\"javascript_exec\",\"text\":\"[...document.querySelectorAll('.rec-chip')].find(b=>b.textContent.includes('plunge')).click();\\nawait new Promise(r=>setTimeout(r,100));\\ndocument.querySelector('.m...",
+  "error": "javascript_tool failed: SyntaxError: await is only valid in async functions and the top level bodies of modules",
+  "timestamp": "2026-08-14T07:17:07.641Z",
+  "retry_count": 1
+}
