@@ -118,6 +118,17 @@ export const LIFTS = {
       { name: 'Rope triceps pushdown', low: 12, high: 12 },
     ],
   },
+  CHEST: {
+    title: 'Chest day',
+    adhoc: true, // startable from any day's Train view, not part of the weekly split
+    exercises: [
+      { name: 'Flat bench press', low: 6, high: 8, main: true, note: 'barbell or DB' },
+      { name: 'Incline DB press', low: 8, high: 10 },
+      { name: 'Cable fly', low: 12, high: 15, note: 'or pec deck' },
+      { name: 'Rope triceps pushdown', low: 10, high: 12 },
+      { name: 'Push-ups', low: 8, high: 15, note: 'finisher — weight 0 is fine' },
+    ],
+  },
   BASELINE: {
     title: 'Onboarding full-body',
     exercises: [

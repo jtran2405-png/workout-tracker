@@ -75,7 +75,17 @@ export function buildCoachReport(doc, week, today = todayStr()) {
       }
       parts.push(`PM ${d?.pmDone ? '✓' : '✗'} ${label}`);
     }
+    const xt = doc.sessions[`${date}:XT`];
+    const xtTitle = xt ? LIFTS[xt.template].title : null;
+    if (xt) {
+      const mains = LIFTS[xt.template].exercises.filter((e) => e.main).map((e) => {
+        const t = topSet(xt.exercises?.[e.name]);
+        return t ? `${e.name} ${t}` : null;
+      }).filter(Boolean);
+      parts.push(`+ ${xtTitle} (ad-hoc${mains.length ? `: ${mains.join(', ')}` : ''})`);
+    }
     for (const x of d?.extras || []) {
+      if (xtTitle && x.note === xtTitle) continue; // already covered by the ad-hoc line
       parts.push(`+ ${x.type}${x.minutes ? ` ${x.minutes}min` : ''}${x.note ? ` (${x.note})` : ''}`);
     }
     L.push(`- ${DAY_ABBR[weekdayOf(date)]} ${date.slice(5)}: ${parts.join(' · ') || 'nothing logged'}`);

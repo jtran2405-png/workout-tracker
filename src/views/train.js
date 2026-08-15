@@ -62,6 +62,7 @@ export function renderTrain(root, ctx) {
     ));
   }
 
+  root.append(adhocCard(ctx, date, day, phase));
   root.append(extrasCard(ctx, date, day));
 
   if (date === doc.settings.startDate) {
@@ -104,10 +105,11 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
     card.append(h('p', { class: 'sub' }, 'Hard no-lift day. Sauna, cold plunge, mobility — let the tissue rebuild.'));
   } else if (spec.type === 'sparring') {
     const mode = sparringMode(week);
+    if (weekdayOf(date) === 0) {
+      card.append(h('div', { style: 'margin-bottom:8px' },
+        h('span', { class: `chip ${mode === 'live' ? 'chip-warn' : 'chip-accent'}` }, mode === 'live' ? 'LIVE sparring' : 'Technical only')));
+    }
     card.append(
-      weekdayOf(date) === 0
-        ? h('div', { style: 'margin-bottom:8px' }, h('span', { class: `chip ${mode === 'live' ? 'chip-warn' : 'chip-accent'}` }, mode === 'live' ? 'LIVE sparring' : 'Technical only'))
-        : null,
       h('textarea', {
         class: 'notes', placeholder: 'Sparring notes — what worked, what got exploited…',
         onchange: (e) => { day.sparringNotes = e.target.value || null; ctx.save(); },
@@ -117,13 +119,43 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
   return card;
 }
 
+// ---------- ad-hoc lift sessions (off-template days: chest with a buddy, etc.) ----------
+
+function adhocCard(ctx, date, day, phase) {
+  const { doc } = ctx;
+  const existing = doc.sessions[sessionKey(date, 'XT')];
+
+  if (existing) {
+    const tpl = LIFTS[existing.template];
+    return h('div', { class: 'card' },
+      h('div', { class: 'slot-head' },
+        h('div', {},
+          h('div', { class: 'slot-tag' }, 'Ad-hoc'),
+          h('div', { class: 'slot-label' }, `${tpl.title} — lift`),
+        ),
+      ),
+      liftBody(ctx, date, day, existing.template, phase, 'XT'),
+      h('p', { class: 'sub', style: 'margin-top:12px' }, 'Counts as a logged extra — it won’t touch the programmed split.'),
+    );
+  }
+
+  const adhocKeys = Object.keys(LIFTS).filter((k) => LIFTS[k].adhoc);
+  return h('div', { class: 'card' },
+    h('h2', {}, 'Off-plan lift?'),
+    ...adhocKeys.map((k) => h('button', {
+      class: 'btn btn-ghost', style: 'width:100%',
+      onclick: () => { getSession(doc, date, 'XT', k); ctx.save(); ctx.refresh(); },
+    }, `+ Start ${LIFTS[k].title.toLowerCase()}`)),
+  );
+}
+
 // ---------- lift logging ----------
 
-function liftBody(ctx, date, day, liftKey, phase) {
+function liftBody(ctx, date, day, liftKey, phase, slot = 'PM') {
   const { doc } = ctx;
   const tpl = LIFTS[liftKey];
   const body = h('div', {});
-  const existing = doc.sessions[sessionKey(date, 'PM')];
+  const existing = doc.sessions[sessionKey(date, slot)];
 
   for (const ex of tpl.exercises) {
     const planned = setsFor(ex, phase);
@@ -156,7 +188,7 @@ function liftBody(ctx, date, day, liftKey, phase) {
       const dBtn = h('button', { class: `set-done${cur.done ? ' on' : ''}`, 'aria-label': `Set ${i + 1} done` }, '✓');
 
       const writeSet = (patch) => {
-        const sess = getSession(doc, date, 'PM', liftKey);
+        const sess = getSession(doc, date, slot, liftKey);
         if (!sess.exercises[ex.name]) sess.exercises[ex.name] = [];
         const arr = sess.exercises[ex.name];
         while (arr.length <= i) arr.push({ weight: null, reps: null, done: false });
@@ -186,20 +218,27 @@ function liftBody(ctx, date, day, liftKey, phase) {
   }
 
   function checkSessionDone() {
-    const sess = ctx.doc.sessions[sessionKey(date, 'PM')];
+    const sess = ctx.doc.sessions[sessionKey(date, slot)];
     if (!sess) return;
     const allDone = tpl.exercises.every((ex) => {
       const planned = setsFor(ex, phase);
       const arr = sess.exercises[ex.name] || [];
       return arr.filter((s) => s.done).length >= planned;
     });
-    if (allDone && !day.pmDone) {
+    if (!allDone || sess.status === 'done') return;
+    sess.status = 'done';
+    if (slot === 'PM') {
       day.pmDone = true;
-      sess.status = 'done';
-      ctx.save();
       toast('Session complete 💪 Sauna time.', 'good');
-      ctx.refresh();
+    } else {
+      // ad-hoc lift: record it as an extra so streak/week view see it
+      if (!day.extras.some((x) => x.note === tpl.title)) {
+        day.extras.push({ time: nowTime(), type: 'Lift', minutes: null, note: tpl.title });
+      }
+      toast(`${tpl.title} done 💪 Logged as an extra.`, 'good');
     }
+    ctx.save();
+    ctx.refresh();
   }
 
   return body;
