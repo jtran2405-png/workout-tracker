@@ -96,6 +96,16 @@ describe('day rules', () => {
     expect(plungeWarning('2026-08-22')).toBeNull();
     expect(plungeWarning('2026-08-23')).toBeNull();
   });
+  it('plunge warns after an ad-hoc lift on an otherwise non-lifting day', () => {
+    const doc = { sessions: { '2026-08-22:XT': { template: 'CHEST' } } };
+    expect(plungeWarning('2026-08-22', null, doc)).toBeTruthy();
+    const day = { extras: [{ type: 'Lift', note: 'Chest day' }] };
+    expect(plungeWarning('2026-08-22', day, null)).toBeTruthy();
+    expect(plungeWarning('2026-08-22', { extras: [{ type: 'Cardio' }] }, { sessions: {} })).toBeNull();
+  });
+  it('Saturday is a freestyle slot', () => {
+    expect(WEEK_TEMPLATE[6].am.type).toBe('freestyle');
+  });
   it('Wednesday template has no lift slot', () => {
     expect(WEEK_TEMPLATE[3].pm.type).toBe('recovery');
     expect(WEEK_TEMPLATE[3].am.type).toBe('cardio');

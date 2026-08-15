@@ -148,7 +148,7 @@ export const WEEK_TEMPLATE = {
   3: { am: { type: 'cardio', label: '30 min walk' },                   pm: { type: 'recovery', label: 'Sauna + cold plunge + mobility' } },
   4: { am: { type: 'cardio', label: '25 min easy cardio' },            pm: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' } },
   5: { am: { type: 'cardio', label: '25 min easy cardio' },            pm: { type: 'lift', lift: 'UPPER_B', after: 'sauna' } },
-  6: { am: { type: 'sparring', label: 'Sparring 10:00' },              pm: { type: 'recovery', label: 'Cold plunge' } },
+  6: { am: { type: 'freestyle', label: 'Freestyle — spar / lift / Zone 2' }, pm: { type: 'recovery', label: 'Cold plunge (skip if you lifted)' } },
   0: { am: null,                                                       pm: { type: 'sparring', label: 'Sparring 16:00' } },
 };
 
@@ -170,9 +170,13 @@ export function canLift(dateStr) {
 
 // Cold plunge blunts adaptation within ~4h of lifting → warn on lifting days.
 // Plunge is fine Wed and after Sat sparring.
-export function plungeWarning(dateStr) {
-  if (!isLiftingDay(dateStr)) return null;
-  return 'Lifting day — a cold plunge within ~4 hours of lifting blunts muscle adaptation. Plunge only Wed and after Sat sparring.';
+// `day`/`doc` are optional: when given, ad-hoc lifts (XT sessions, extras
+// of type Lift) trigger the warning too — e.g. a freestyle-Saturday chest day.
+export function plungeWarning(dateStr, day = null, doc = null) {
+  const liftedAdhoc = !!(doc?.sessions?.[`${dateStr}:XT`])
+    || (day?.extras || []).some((x) => x.type === 'Lift');
+  if (!isLiftingDay(dateStr) && !liftedAdhoc) return null;
+  return 'You lifted today — a cold plunge within ~4 hours of lifting blunts muscle adaptation. Sauna is fine; plunge on non-lifting days.';
 }
 
 // ---------- sets / reps by phase ----------

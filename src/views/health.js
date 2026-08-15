@@ -103,7 +103,7 @@ export function renderHealth(root, ctx) {
     class: `rec-chip${day.recovery[key] ? ' on' : ''}`,
     onclick: async () => {
       if (key === 'plunge' && !day.recovery.plunge) {
-        const warn = plungeWarning(date);
+        const warn = plungeWarning(date, day, doc);
         if (warn) {
           const ok = await confirmDialog({ title: 'Cold plunge on a lifting day?', body: warn });
           if (!ok) return;
@@ -118,8 +118,8 @@ export function renderHealth(root, ctx) {
   root.append(h('div', { class: 'card' },
     h('h2', {}, 'Recovery'),
     h('div', { class: 'recovery-chips' }, chip('sauna', '🔥 Sauna'), chip('plunge', '🧊 Cold plunge')),
-    plungeWarning(date) && !day.recovery.plunge
-      ? h('div', { class: 'warn-note' }, '⚠︎', 'Lifting day — skip the plunge (sauna is fine).')
+    plungeWarning(date, day, doc) && !day.recovery.plunge
+      ? h('div', { class: 'warn-note' }, '⚠︎', 'You lifted today — skip the plunge (sauna is fine).')
       : null,
   ));
 }

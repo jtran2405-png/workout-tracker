@@ -103,6 +103,15 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
     card.append(h('p', { class: 'sub', style: 'margin-top:12px' }, '→ sauna after (always fine post-lift)'));
   } else if (spec.type === 'recovery' && weekdayOf(date) === 3) {
     card.append(h('p', { class: 'sub' }, 'Hard no-lift day. Sauna, cold plunge, mobility — let the tissue rebuild.'));
+  } else if (spec.type === 'freestyle') {
+    card.append(
+      h('p', { class: 'sub', style: 'margin-bottom:8px' },
+        'How you feel today: sparring, an ad-hoc lift (card below), or easy Zone 2. Something counts — nothing is a zero.'),
+      h('textarea', {
+        class: 'notes', placeholder: 'What did you do? Notes…',
+        onchange: (e) => { day.sparringNotes = e.target.value || null; ctx.save(); },
+      }, day.sparringNotes || ''),
+    );
   } else if (spec.type === 'sparring') {
     const mode = sparringMode(week);
     if (weekdayOf(date) === 0) {
