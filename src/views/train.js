@@ -4,7 +4,7 @@
 import {
   todayStr, addDays, weekdayOf, weekNumber, phaseFor, PHASE_INFO, DAY_NAMES,
   slotsFor, LIFTS, setsFor, repRange, repTargetLabel, suggestNextWeight,
-  sparringMode, parseDate,
+  sparringMode, parseDate, runPace,
 } from '../program.js';
 import { getDay, getSession, sessionKey, lastSetsFor } from '../store.js';
 import { h, toast, nowTime } from '../ui.js';
@@ -259,26 +259,31 @@ function fmtW(w) {
 
 // ---------- extra sessions (unscheduled: light Muay Thai, a swim, a walk…) ----------
 
-const EXTRA_TYPES = ['Muay Thai', 'Cardio', 'Mobility', 'Swim', 'Lift', 'Other'];
+const EXTRA_TYPES = ['Run', 'Muay Thai', 'Cardio', 'Core', 'Plyo', 'Mobility', 'Swim', 'Lift', 'Other'];
 
 function extrasCard(ctx, date, day) {
   const list = h('div', {});
   const render = () => {
     list.innerHTML = '';
     (day.extras || []).forEach((x, i) => {
-      const sel = h('select', { class: 'inline-select', onchange: (e) => { x.type = e.target.value; ctx.save(); } });
+      const sel = h('select', { class: 'inline-select', onchange: (e) => { x.type = e.target.value; ctx.save(); render(); } });
       for (const t of EXTRA_TYPES) sel.append(h('option', { value: t, selected: t === x.type }, t));
+      const pace = x.type === 'Run' ? runPace(x.km, x.minutes) : null;
       list.append(
         h('div', { class: 'weed-row' },
           h('input', { type: 'time', value: x.time, onchange: (e) => { x.time = e.target.value; ctx.save(); } }),
           sel,
           h('button', { class: 'iconbtn', 'aria-label': 'Remove', onclick: () => { day.extras.splice(i, 1); ctx.save(); render(); } }, '×'),
         ),
-        h('div', { class: 'weed-row', style: 'margin-bottom:14px' },
-          h('input', { type: 'number', inputmode: 'numeric', min: '0', step: '5', placeholder: 'min', style: 'flex:0 0 90px', value: x.minutes ?? '', onchange: (e) => { x.minutes = e.target.value === '' ? null : Number(e.target.value); ctx.save(); } }),
+        h('div', { class: 'weed-row', style: x.type === 'Run' ? '' : 'margin-bottom:14px' },
+          h('input', { type: 'number', inputmode: 'numeric', min: '0', step: '5', placeholder: 'min', style: 'flex:0 0 80px', value: x.minutes ?? '', onchange: (e) => { x.minutes = e.target.value === '' ? null : Number(e.target.value); ctx.save(); render(); } }),
+          x.type === 'Run'
+            ? h('input', { type: 'number', inputmode: 'decimal', min: '0', step: '0.01', placeholder: 'km', style: 'flex:0 0 80px', value: x.km ?? '', onchange: (e) => { x.km = e.target.value === '' ? null : Number(e.target.value); ctx.save(); render(); } })
+            : null,
           h('input', { type: 'text', placeholder: 'notes (optional)', value: x.note || '', onchange: (e) => { x.note = e.target.value; ctx.save(); } }),
         ),
       );
+      if (pace) list.append(h('p', { class: 'sub', style: 'margin:2px 2px 14px' }, `pace ${pace}`));
     });
   };
   render();

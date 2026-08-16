@@ -40,7 +40,7 @@ export function daysCsv(doc) {
       d.food?.protein ? 1 : 0, d.food?.junk ? 1 : 0, d.food?.late ? 1 : 0, d.food?.note ?? '',
       d.recovery?.sauna ? 1 : 0, d.recovery?.plunge ? 1 : 0,
       d.amDone ? 1 : 0, d.pmDone ? 1 : 0, d.sparringNotes ?? '',
-      (d.extras || []).map((x) => `${x.time} ${x.type}${x.minutes ? ` ${x.minutes}min` : ''}${x.note ? ` (${x.note})` : ''}`).join('; '),
+      (d.extras || []).map((x) => `${x.time} ${x.type}${x.km ? ` ${x.km}km` : ''}${x.minutes ? ` ${x.minutes}min` : ''}${x.note ? ` (${x.note})` : ''}`).join('; '),
     ]));
   }
   return lines.join('\n') + '\n';

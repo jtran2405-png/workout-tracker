@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   weekNumber, phaseFor, setsFor, repRange, suggestNextWeight,
   canLift, plungeWarning, sparringMode, WEEK_TEMPLATE, LIFTS,
-  mondayOfWeek, addDays,
+  mondayOfWeek, addDays, runPace,
 } from '../src/program.js';
 
 describe('week numbering (week 1 = Mon 2026-08-17)', () => {
@@ -105,6 +105,12 @@ describe('day rules', () => {
   });
   it('Saturday is a freestyle slot', () => {
     expect(WEEK_TEMPLATE[6].am.type).toBe('freestyle');
+  });
+  it('run pace formats mm:ss per km', () => {
+    expect(runPace(3.14, 21)).toBe('6:41/km');
+    expect(runPace(5, 25)).toBe('5:00/km');
+    expect(runPace(null, 21)).toBeNull();
+    expect(runPace(3.14, null)).toBeNull();
   });
   it('Wednesday template has no lift slot', () => {
     expect(WEEK_TEMPLATE[3].pm.type).toBe('recovery');

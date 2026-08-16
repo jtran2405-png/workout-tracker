@@ -129,6 +129,50 @@ export const LIFTS = {
       { name: 'Push-ups', low: 8, high: 15, note: 'finisher — weight 0 is fine' },
     ],
   },
+  BACK_DAY: {
+    title: 'Back day',
+    adhoc: true,
+    exercises: [
+      { name: 'Lat pulldown', low: 8, high: 10, main: true, note: 'or assisted pull-up' },
+      { name: 'Seated cable row', low: 10, high: 12 },
+      { name: 'Chest-supported row', low: 10, high: 12 },
+      { name: 'Straight-arm pulldown', low: 12, high: 15 },
+      { name: 'Barbell/cable curl', low: 10, high: 12 },
+    ],
+  },
+  SHOULDER_DAY: {
+    title: 'Shoulder day',
+    adhoc: true,
+    exercises: [
+      { name: 'DB shoulder press', low: 8, high: 10, main: true },
+      { name: 'Cable lateral raise', low: 12, high: 15 },
+      { name: 'Rear delt fly', low: 12, high: 15, note: 'cable or pec-deck reverse' },
+      { name: 'DB shrug', low: 10, high: 12 },
+      { name: 'Neck work', low: 12, high: 15 },
+    ],
+  },
+  ARM_DAY: {
+    title: 'Arm day',
+    adhoc: true,
+    exercises: [
+      { name: 'EZ-bar curl', low: 8, high: 12, main: true },
+      { name: 'Rope triceps pushdown', low: 10, high: 12 },
+      { name: 'Incline DB curl', low: 10, high: 12 },
+      { name: 'Overhead rope extension', low: 10, high: 12 },
+      { name: 'Hammer curl', low: 10, high: 12 },
+    ],
+  },
+  FULL_BODY: {
+    title: 'Full-body (quick)',
+    adhoc: true,
+    exercises: [
+      { name: 'Goblet squat', low: 10, high: 12 },
+      { name: 'Flat bench press', low: 8, high: 10, note: 'barbell or DB' },
+      { name: 'Lat pulldown', low: 8, high: 10 },
+      { name: 'DB shoulder press', low: 8, high: 10 },
+      { name: "Farmer's carry", low: 1, high: 1, note: 'log trips as reps, weight per hand' },
+    ],
+  },
   BASELINE: {
     title: 'Onboarding full-body',
     exercises: [
@@ -177,6 +221,13 @@ export function plungeWarning(dateStr, day = null, doc = null) {
     || (day?.extras || []).some((x) => x.type === 'Lift');
   if (!isLiftingDay(dateStr) && !liftedAdhoc) return null;
   return 'You lifted today — a cold plunge within ~4 hours of lifting blunts muscle adaptation. Sauna is fine; plunge on non-lifting days.';
+}
+
+// "6:41/km" from distance + duration; null when either is missing
+export function runPace(km, minutes) {
+  if (!km || !minutes) return null;
+  const s = Math.round((minutes * 60) / km);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}/km`;
 }
 
 // ---------- sets / reps by phase ----------

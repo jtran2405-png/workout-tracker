@@ -3,7 +3,7 @@
 
 import {
   addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
-  slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr,
+  slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace,
 } from './program.js';
 import { currentStreak, weekAdherence } from './grit.js';
 
@@ -86,7 +86,8 @@ export function buildCoachReport(doc, week, today = todayStr()) {
     }
     for (const x of d?.extras || []) {
       if (xtTitle && x.note === xtTitle) continue; // already covered by the ad-hoc line
-      parts.push(`+ ${x.type}${x.minutes ? ` ${x.minutes}min` : ''}${x.note ? ` (${x.note})` : ''}`);
+      const pace = x.type === 'Run' ? runPace(x.km, x.minutes) : null;
+      parts.push(`+ ${x.type}${x.km ? ` ${x.km}km` : ''}${x.minutes ? ` ${x.minutes}min` : ''}${pace ? ` @ ${pace}` : ''}${x.note ? ` (${x.note})` : ''}`);
     }
     L.push(`- ${DAY_ABBR[weekdayOf(date)]} ${date.slice(5)}: ${parts.join(' · ') || 'nothing logged'}`);
   }

@@ -64,7 +64,7 @@ export function renderWeek(root, ctx) {
         ...(day?.extras || []).map((x) => h('div', { class: 'wd-slot' },
           h('span', { class: 'tag' }, '＋'),
           h('span', { class: 'dot done' }),
-          `${x.type}${x.minutes ? ` · ${x.minutes} min` : ''}`,
+          `${x.type}${x.km ? ` ${x.km} km` : ''}${x.minutes ? ` · ${x.minutes} min` : ''}`,
         )),
       ),
     ));
