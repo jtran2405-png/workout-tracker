@@ -41,7 +41,8 @@ export function renderProgress(root, ctx) {
   const sleepDays = Object.keys(doc.days).filter((d) => doc.days[d].sleepHours != null && d > addDays(today, -7));
   const avgSleep = sleepDays.length ? sleepDays.reduce((a, d) => a + doc.days[d].sleepHours, 0) / sleepDays.length : null;
 
-  const week = Math.max(1, weekNumber(today, doc.settings.week1Monday));
+  // current calendar week, including week 0 (baseline) — never a future week
+  const week = Math.max(0, weekNumber(today, doc.settings.week1Monday));
   const monday = mondayOfWeek(week, doc.settings.week1Monday);
   let weedCount = 0, liftsDone = 0;
   for (let i = 0; i < 7; i++) {

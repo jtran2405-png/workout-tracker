@@ -17,7 +17,7 @@ export function renderHealth(root, ctx) {
   const isToday = date === todayStr();
   const day = getDay(doc, date);
   const streak = currentStreak(doc);
-  const week = Math.max(1, weekNumber(todayStr(), doc.settings.week1Monday));
+  const week = Math.max(0, weekNumber(todayStr(), doc.settings.week1Monday));
   const adh = weekAdherence(doc, week);
 
   root.append(

@@ -63,4 +63,9 @@ describe('week adherence', () => {
     expect(adh.planned).toBe(0);
     expect(adh.pct).toBeNull();
   });
+  it('days before startDate never count (baseline week 0)', () => {
+    // week 0 = Aug 10–16, startDate Fri Aug 14 → only Fri+Sat slots elapsed by Sun 16
+    const adh = weekAdherence(emptyDoc(), 0, '2026-08-16');
+    expect(adh.planned).toBe(4);
+  });
 });

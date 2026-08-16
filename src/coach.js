@@ -59,6 +59,7 @@ export function buildCoachReport(doc, week, today = todayStr()) {
   for (let i = 0; i < 7; i++) {
     const date = addDays(monday, i);
     if (date > today) break;
+    if (doc.settings.startDate && date < doc.settings.startDate) continue; // before day one
     const tpl = slotsFor(date);
     const d = doc.days[date];
     const parts = [];

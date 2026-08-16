@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "jobId": "f89da10f-74cb-44b7-8d0e-54eccc8b4b5d",
+  "sessionId": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+  "scopeKey": "b4bd4c5c1c692837ab4fe16f3d4eff7497e57db9e433a3ad0d6dd69740b95ddb",
+  "revision": 41,
+  "createdAt": "2026-08-16T04:09:44.119Z",
+  "updatedAt": "2026-08-16T04:09:46.020Z",
+  "producerGraceExpiresAt": "2026-08-16T04:10:14.120Z",
+  "bestEffortDeadlineAt": "2026-08-16T04:11:05.120Z",
+  "producers": {
+    "core": {
+      "state": "sealed",
+      "intentKey": "488a7188892be91c818c1a7dc033a4f1807ac378b1f7f19bd070f8d890c708a3",
+      "payloadDigest": "488a7188892be91c818c1a7dc033a4f1807ac378b1f7f19bd070f8d890c708a3",
+      "sealedAt": "2026-08-16T04:09:44.201Z",
+      "sealedBy": "foreground"
+    },
+    "wiki": {
+      "state": "no-op",
+      "sealedAt": "2026-08-16T04:09:44.119Z",
+      "sealedBy": "wiki-producer"
+    }
+  },
+  "actions": {
+    "foreground-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 0,
+      "idempotencyKey": "febf6dba2f2536433960a07f7cedce72e946b43ced0896570df80f017b8914d2",
+      "payload": {
+        "transcriptPath": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+        "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+        "reason": "other",
+        "input": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "transcript_path": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+          "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+          "prompt_id": "89546054-b8ff-476c-b5e9-eb58dfba3596",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "ended_at": "2026-08-16T04:09:44.116Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {},
+        "foregroundResult": {
+          "removedTransientFiles": 2,
+          "completedAt": "2026-08-16T04:09:44.200Z"
+        }
+      },
+      "budgetMs": 9000,
+      "completedAt": "2026-08-16T04:09:44.201Z",
+      "lastOutcomeCode": "completed"
+    },
+    "wiki-capture": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 0,
+      "idempotencyKey": "1719cd1ef5b51e0269b78c4cb8c9308c9c1f7b82fd1c067fc034c060f23863f5",
+      "payload": {},
+      "budgetMs": 9000,
+      "completedAt": "2026-08-16T04:09:44.119Z"
+    },
+    "team-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "cee6ac31df545408e1e822247ac249b3f8182a98a5fe8e448ae3b251e55bdee1",
+      "payload": {
+        "transcriptPath": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+        "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+        "reason": "other",
+        "input": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "transcript_path": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+          "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+          "prompt_id": "89546054-b8ff-476c-b5e9-eb58dfba3596",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "ended_at": "2026-08-16T04:09:44.116Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-08-16T04:09:44.356Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "586c1326-4252-4acc-b49f-2e900230d804",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-16T04:09:54.302Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-16T04:09:44.615Z"
+    },
+    "python-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "1f1370c4ac056606059d517e2f106b602d8cbcb04587b3fcc5f3b9f89e649cd0",
+      "payload": {
+        "transcriptPath": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+        "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+        "reason": "other",
+        "input": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "transcript_path": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+          "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+          "prompt_id": "89546054-b8ff-476c-b5e9-eb58dfba3596",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "ended_at": "2026-08-16T04:09:44.116Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-08-16T04:09:44.637Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "7a49b0b4-779e-4c85-a34e-62d3f1f1a64b",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-16T04:09:54.302Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-16T04:09:44.923Z"
+    },
+    "reply-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "0b3a8b47c28b26d56aca004d4f572b96c118f16819c0d35162418816f9a5420a",
+      "payload": {
+        "transcriptPath": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+        "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+        "reason": "other",
+        "input": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "transcript_path": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+          "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+          "prompt_id": "89546054-b8ff-476c-b5e9-eb58dfba3596",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "ended_at": "2026-08-16T04:09:44.116Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-08-16T04:09:44.945Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "85368d58-6486-4a65-b6fe-e72e10b7029a",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-16T04:09:54.302Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-16T04:09:45.197Z"
+    },
+    "callback": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "d068ede2655bf89e0c0950e087d0603d7dcf45538e94f20a654d08c6f4841895",
+      "payload": {
+        "transcriptPath": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+        "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+        "reason": "other",
+        "input": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "transcript_path": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+          "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+          "prompt_id": "89546054-b8ff-476c-b5e9-eb58dfba3596",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "ended_at": "2026-08-16T04:09:44.116Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-08-16T04:09:45.215Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "fd8142c3-5556-48e0-b69e-2cdc356bbbf1",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-16T04:09:54.302Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-16T04:09:45.464Z"
+    },
+    "notification": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "89c0438ff63097ce04beb60efb87292ff68a7af350a0ee331f3de9dbf42d62fc",
+      "payload": {
+        "transcriptPath": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+        "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+        "reason": "other",
+        "input": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "transcript_path": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+          "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+          "prompt_id": "89546054-b8ff-476c-b5e9-eb58dfba3596",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "ended_at": "2026-08-16T04:09:44.116Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-08-16T04:09:45.487Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "573b5872-48f8-4865-a03e-0cce34a6bcb6",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-16T04:09:54.302Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-16T04:09:45.724Z"
+    },
+    "openclaw": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "31fe8f6e1cf204e27006de511df257326fdd98655122ca437013e8779ffc735b",
+      "payload": {
+        "transcriptPath": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+        "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+        "reason": "other",
+        "input": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "transcript_path": "/Users/jtranny/.claude/projects/-Users-jtranny-Desktop-PORTFOLIO/05e5bf4c-fa1b-45c9-94cc-899787693b1e.jsonl",
+          "cwd": "/Users/jtranny/Desktop/PORTFOLIO/workout-tracker",
+          "prompt_id": "89546054-b8ff-476c-b5e9-eb58dfba3596",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "05e5bf4c-fa1b-45c9-94cc-899787693b1e",
+          "ended_at": "2026-08-16T04:09:44.116Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-08-16T04:09:45.745Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "3647faa6-88ed-412d-9668-5884eb9b85f9",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-16T04:09:54.302Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-16T04:09:45.982Z"
+    }
+  },
+  "owner": null,
+  "phase": "complete",
+  "completion": {
+    "completedAt": "2026-08-16T04:09:46.003Z",
+    "terminalDigest": "777e6829616af531211bbadd58008c90cab62852da82251c89de68e5799cf9de",
+    "terminalRevision": 40
+  }
+}

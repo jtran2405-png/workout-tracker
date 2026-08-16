@@ -49,3 +49,19 @@ describe('coach report', () => {
     expect(report).not.toContain('Wed 08-19');
   });
 });
+
+describe('coach report — baseline week 0', () => {
+  it('covers the current calendar week and skips pre-start days', () => {
+    const doc = emptyDoc();
+    doc.days['2026-08-14'] = {
+      wake: '06:30', bedtime: null, sleepHours: null, bodyWeight: 79.5,
+      weed: [], extras: [], food: { protein: true, junk: false, late: false, note: '' },
+      recovery: { sauna: true, plunge: false }, amDone: true, pmDone: false, sparringNotes: null,
+    };
+    const r = buildCoachReport(doc, 0, '2026-08-16');
+    expect(r).toContain('Week 0 (2026-08-10 → 2026-08-16)');
+    expect(r).toContain('Fri 08-14');
+    expect(r).not.toContain('Mon 08-10');
+    expect(r).toContain('Weight: 79.5 → 79.5 kg');
+  });
+});

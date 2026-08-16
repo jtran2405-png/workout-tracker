@@ -29,6 +29,7 @@ export function weekAdherence(doc, week, today = todayStr()) {
   let done = 0;
   for (let i = 0; i < 7; i++) {
     const date = addDays(monday, i);
+    if (doc.settings.startDate && date < doc.settings.startDate) continue; // before day one
     const tpl = slotsFor(date);
     const day = doc.days[date];
     for (const slot of ['am', 'pm']) {

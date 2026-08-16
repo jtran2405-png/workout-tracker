@@ -23,7 +23,7 @@ export function renderTrain(root, ctx) {
   const week = weekNumber(date, doc.settings.week1Monday);
   const phase = phaseFor(week, doc.settings.phaseOverride);
   const template = slotsFor(date);
-  const adh = weekAdherence(doc, Math.max(1, weekNumber(todayStr(), doc.settings.week1Monday)));
+  const adh = weekAdherence(doc, Math.max(0, weekNumber(todayStr(), doc.settings.week1Monday)));
 
   root.append(
     h('div', { class: 'page-head' },
