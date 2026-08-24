@@ -33,6 +33,16 @@ describe('streak', () => {
     doc.days['2026-08-18'] = day(); // today, nothing yet
     expect(currentStreak(doc, '2026-08-18')).toBe(1);
   });
+  it('an unfinished ad-hoc lift with done sets keeps the chain alive', () => {
+    const doc = emptyDoc();
+    doc.days['2026-08-19'] = day(); // Wed: no slots done, no extras…
+    doc.sessions['2026-08-19:XT'] = {
+      date: '2026-08-19', slot: 'XT', template: 'ARM_DAY', status: 'open',
+      exercises: { 'EZ-bar curl': [{ weight: 20, reps: 10, done: true }] },
+    };
+    doc.days['2026-08-20'] = day({ pmDone: true });
+    expect(currentStreak(doc, '2026-08-20')).toBe(2);
+  });
   it('a zero day resets the chain', () => {
     const doc = emptyDoc();
     doc.days['2026-08-15'] = day({ amDone: true });

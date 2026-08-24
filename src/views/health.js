@@ -36,7 +36,7 @@ export function renderHealth(root, ctx) {
       h('div', { class: 'grit-item' }, h('span', { class: 'grit-num' }, String(streak)), h('span', { class: 'grit-label' }, streak === 1 ? 'day streak' : 'day streak')),
       h('div', { class: 'grit-item' }, h('span', { class: 'grit-num' }, adh.pct != null ? `${adh.pct}%` : '—'), h('span', { class: 'grit-label' }, `adherence (${adh.done}/${adh.planned})`)),
       h('div', { class: 'grit-item' },
-        h('span', { class: `grit-num ${isNonZeroDay(getDay(doc, todayStr())) ? 'grit-good' : 'grit-bad'}` }, isNonZeroDay(getDay(doc, todayStr())) ? '✓' : '·'),
+        h('span', { class: `grit-num ${isNonZeroDay(getDay(doc, todayStr()), todayStr(), doc) ? 'grit-good' : 'grit-bad'}` }, isNonZeroDay(getDay(doc, todayStr()), todayStr(), doc) ? '✓' : '·'),
         h('span', { class: 'grit-label' }, 'showed up today')),
     ),
     h('p', { class: 'sub', style: 'margin: -4px 2px 12px; font-size: 12.5px; color: var(--muted)' },

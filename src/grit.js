@@ -3,17 +3,24 @@
 
 import { addDays, todayStr, slotsFor, mondayOfWeek } from './program.js';
 
-export function isNonZeroDay(day) {
-  return !!day && (day.amDone || day.pmDone || (day.extras || []).length > 0);
+export function isNonZeroDay(day, date = null, doc = null) {
+  if (!!day && (day.amDone || day.pmDone || (day.extras || []).length > 0)) return true;
+  // an ad-hoc lift with at least one completed set counts, even if the
+  // session was never fully finished
+  if (date && doc) {
+    const xt = doc.sessions?.[`${date}:XT`];
+    if (xt && Object.values(xt.exercises || {}).some((sets) => (sets || []).some((s) => s.done))) return true;
+  }
+  return false;
 }
 
 // Consecutive non-zero days ending today (today doesn't break the streak
 // while it's still in progress — it counts once logged).
 export function currentStreak(doc, today = todayStr()) {
   let d = today;
-  if (!isNonZeroDay(doc.days[d])) d = addDays(d, -1);
+  if (!isNonZeroDay(doc.days[d], d, doc)) d = addDays(d, -1);
   let streak = 0;
-  while (isNonZeroDay(doc.days[d])) {
+  while (isNonZeroDay(doc.days[d], d, doc)) {
     streak++;
     d = addDays(d, -1);
   }
