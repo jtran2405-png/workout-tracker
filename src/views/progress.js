@@ -54,6 +54,21 @@ export function renderProgress(root, ctx) {
     if (s.date >= monday && s.date <= addDays(monday, 6) && s.status === 'done' && s.template !== 'BASELINE') liftsDone++;
   }
 
+  const reportButton = (docRef, wk, cls, label) => h('button', {
+    class: cls, style: 'width:100%; margin-top:8px',
+    onclick: async () => {
+      const report = buildCoachReport(docRef, wk);
+      try {
+        await navigator.clipboard.writeText(report);
+        toast(`Week ${wk} report copied — paste it to Claude`, 'good');
+      } catch {
+        // clipboard can be blocked (older iOS): fall back to share sheet
+        if (navigator.share) navigator.share({ text: report });
+        else toast('Could not copy — try again', 'warn');
+      }
+    },
+  }, label);
+
   const tile = (label, value, delta) => h('div', { class: 'stat-tile' },
     h('div', { class: 'st-label' }, label),
     h('div', { class: 'st-value' }, value),
@@ -81,20 +96,10 @@ export function renderProgress(root, ctx) {
     h('h2', {}, 'Coach check-in'),
     h('p', { class: 'sub', style: 'margin-bottom:10px' },
       'Sunday night: copy the report, paste it to Claude (/coach). Numbers don’t negotiate.'),
-    h('button', {
-      class: 'btn btn-primary', style: 'width:100%',
-      onclick: async () => {
-        const report = buildCoachReport(doc, week);
-        try {
-          await navigator.clipboard.writeText(report);
-          toast('Coach report copied — paste it to Claude', 'good');
-        } catch {
-          // clipboard can be blocked (older iOS): fall back to share sheet
-          if (navigator.share) navigator.share({ text: report });
-          else toast('Could not copy — try again', 'warn');
-        }
-      },
-    }, '📋 Copy coach report — week ' + week),
+    reportButton(doc, week, 'btn btn-primary', `📋 Copy coach report — week ${week}`),
+    week >= 1
+      ? reportButton(doc, week - 1, 'btn btn-ghost', `Copy last week's report — week ${week - 1}`)
+      : null,
   ));
 
   // ---- per-exercise progression ----
