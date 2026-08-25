@@ -5,8 +5,8 @@ export const DEFAULT_SETTINGS = {
   week1Monday: '2026-08-17', // program weeks are Monday-anchored
   phaseOverride: null,       // null | 'ramp' | 'build'
   unit: 'kg',
-  walkAround: 56.5,          // lean walk-around target ≈125 lb (fighters don't live at fight weight)
-  goalWeight: 53.5,          // fight weight ≈118 lb — reached in camp, not lived at
+  walkAround: 58,            // lean walk-around target ≈128 lb (realistic range 127–130)
+  goalWeight: 55.5,          // fight weight ≈122 lb (range 121–123); water cut covers lower when needed
 };
 
 export function kgLb(kg) {
