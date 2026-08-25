@@ -194,10 +194,10 @@ export const LIFTS = {
 // Weekly template keyed by weekday (0=Sun..6=Sat).
 export const WEEK_TEMPLATE = {
   1: { am: { type: 'cardio', label: '25 min easy cardio + mobility' }, pm: { type: 'lift', lift: 'LOWER', after: 'sauna' } },
-  2: { am: { type: 'cardio', label: '25 min easy cardio' },            pm: { type: 'lift', lift: 'UPPER_A', after: 'sauna' } },
+  2: { am: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' }, pm: { type: 'lift', lift: 'UPPER_A', after: 'sauna' } },
   3: { am: { type: 'cardio', label: '30 min walk' },                   pm: { type: 'recovery', label: 'Sauna + cold plunge + mobility' } },
   4: { am: { type: 'cardio', label: '25 min easy cardio' },            pm: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' } },
-  5: { am: { type: 'cardio', label: '25 min easy cardio' },            pm: { type: 'lift', lift: 'UPPER_B', after: 'sauna' } },
+  5: { am: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' }, pm: { type: 'lift', lift: 'UPPER_B', after: 'sauna' } },
   6: { am: { type: 'freestyle', label: 'Freestyle — spar / lift / Zone 2' }, pm: { type: 'recovery', label: 'Cold plunge (skip if you lifted)' } },
   0: { am: null,                                                       pm: { type: 'sparring', label: 'Sparring 16:00' } },
 };
