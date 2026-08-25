@@ -39,6 +39,10 @@ export function buildCoachReport(doc, week, today = todayStr()) {
   L.push(weights.length
     ? `- Weight: ${weights[0]} → ${weights[weights.length - 1]} kg (Δ ${(weights[weights.length - 1] - weights[0]).toFixed(1)})`
     : '- Weight: no entries');
+  if (weights.length && doc.settings.walkAround) {
+    const cur = weights[weights.length - 1];
+    L.push(`- Cut: ${Math.max(0, cur - doc.settings.walkAround).toFixed(1)} kg to walk-around (${doc.settings.walkAround}) · fight weight ${doc.settings.goalWeight} · cap 0.5 kg/wk`);
+  }
   L.push(sleeps.length
     ? `- Sleep: avg ${(sleeps.reduce((a, b) => a + b, 0) / sleeps.length).toFixed(1)}h · ${sleeps.filter((s) => s < 7).length} night(s) under 7h`
     : '- Sleep: no entries');

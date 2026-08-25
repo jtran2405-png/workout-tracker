@@ -84,7 +84,12 @@ export function renderProgress(root, ctx) {
     tile('Adherence · wk', adh.pct != null ? `${adh.pct}%` : '—',
       h('div', { class: `st-delta ${adh.pct != null && adh.pct >= 80 ? 'down' : 'up'}` }, `${adh.done}/${adh.planned} planned slots`)),
     tile('Body weight', latestW != null ? `${latestW} kg` : '—',
-      delta != null ? h('div', { class: `st-delta ${delta <= 0 ? 'down' : 'up'}` }, `${delta > 0 ? '+' : ''}${delta.toFixed(1)} kg vs last week`) : null),
+      h('div', {},
+        delta != null ? h('div', { class: `st-delta ${delta <= 0 ? 'down' : 'up'}` }, `${delta > 0 ? '+' : ''}${delta.toFixed(1)} kg vs last week`) : null,
+        latestW != null && doc.settings.walkAround
+          ? h('div', { class: 'st-delta' }, `${Math.max(0, latestW - doc.settings.walkAround).toFixed(1)} to walk-around ${doc.settings.walkAround}`)
+          : null,
+      )),
     tile('Sleep · 7d avg', avgSleep != null ? `${avgSleep.toFixed(1)} h` : '—',
       avgSleep != null ? h('div', { class: `st-delta ${avgSleep >= 7 ? 'down' : 'up'}` }, avgSleep >= 7 ? 'on target (7h+)' : 'below 7h target') : null),
     tile('Lifts this week', `${liftsDone} / 4`),
