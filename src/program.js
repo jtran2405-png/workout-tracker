@@ -5,9 +5,13 @@ export const DEFAULT_SETTINGS = {
   week1Monday: '2026-08-17', // program weeks are Monday-anchored
   phaseOverride: null,       // null | 'ramp' | 'build'
   unit: 'kg',
-  walkAround: 56.5,          // lean walk-around target (fighters don't live at fight weight)
-  goalWeight: 53,            // fight weight — reached in camp, not lived at
+  walkAround: 56.5,          // lean walk-around target ≈125 lb (fighters don't live at fight weight)
+  goalWeight: 53.5,          // fight weight ≈118 lb — reached in camp, not lived at
 };
+
+export function kgLb(kg) {
+  return `${kg} kg / ${Math.round(kg * 2.2046)} lb`;
+}
 
 export const WEIGHT_INCREMENT = 2.5;
 

@@ -1,6 +1,6 @@
 import {
   todayStr, addDays, weekNumber, mondayOfWeek, phaseFor, LIFTS,
-  setsFor, repRange, suggestNextWeight, parseDate,
+  setsFor, repRange, suggestNextWeight, parseDate, kgLb,
 } from '../program.js';
 import { historyFor, lastSetsFor } from '../store.js';
 import { h, toast } from '../ui.js';
@@ -87,7 +87,7 @@ export function renderProgress(root, ctx) {
       h('div', {},
         delta != null ? h('div', { class: `st-delta ${delta <= 0 ? 'down' : 'up'}` }, `${delta > 0 ? '+' : ''}${delta.toFixed(1)} kg vs last week`) : null,
         latestW != null && doc.settings.walkAround
-          ? h('div', { class: 'st-delta' }, `${Math.max(0, latestW - doc.settings.walkAround).toFixed(1)} to walk-around ${doc.settings.walkAround}`)
+          ? h('div', { class: 'st-delta' }, `${Math.max(0, latestW - doc.settings.walkAround).toFixed(1)} to walk-around (${kgLb(doc.settings.walkAround)})`)
           : null,
       )),
     tile('Sleep · 7d avg', avgSleep != null ? `${avgSleep.toFixed(1)} h` : '—',

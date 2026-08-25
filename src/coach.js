@@ -3,7 +3,7 @@
 
 import {
   addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
-  slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace,
+  slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb,
 } from './program.js';
 import { currentStreak, weekAdherence } from './grit.js';
 
@@ -41,7 +41,7 @@ export function buildCoachReport(doc, week, today = todayStr()) {
     : '- Weight: no entries');
   if (weights.length && doc.settings.walkAround) {
     const cur = weights[weights.length - 1];
-    L.push(`- Cut: ${Math.max(0, cur - doc.settings.walkAround).toFixed(1)} kg to walk-around (${doc.settings.walkAround}) · fight weight ${doc.settings.goalWeight} · cap 0.5 kg/wk`);
+    L.push(`- Cut: ${Math.max(0, cur - doc.settings.walkAround).toFixed(1)} kg to walk-around (${kgLb(doc.settings.walkAround)}) · fight ${kgLb(doc.settings.goalWeight)} · cap 0.5 kg/wk`);
   }
   L.push(sleeps.length
     ? `- Sleep: avg ${(sleeps.reduce((a, b) => a + b, 0) / sleeps.length).toFixed(1)}h · ${sleeps.filter((s) => s < 7).length} night(s) under 7h`
