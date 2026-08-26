@@ -99,7 +99,7 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
   );
 
   if (spec.type === 'lift') {
-    card.append(liftBody(ctx, date, day, spec.lift, phase));
+    card.append(liftBody(ctx, date, day, spec.lift, phase, slot));
     card.append(h('p', { class: 'sub', style: 'margin-top:12px' }, '→ sauna after (always fine post-lift)'));
   } else if (spec.type === 'recovery' && weekdayOf(date) === 3) {
     card.append(h('p', { class: 'sub' }, 'Hard no-lift day. Sauna, cold plunge, mobility — let the tissue rebuild.'));
@@ -236,8 +236,8 @@ function liftBody(ctx, date, day, liftKey, phase, slot = 'PM') {
     });
     if (!allDone || sess.status === 'done') return;
     sess.status = 'done';
-    if (slot === 'PM') {
-      day.pmDone = true;
+    if (slot === 'AM' || slot === 'PM') {
+      day[slot === 'AM' ? 'amDone' : 'pmDone'] = true;
       toast('Session complete 💪 Sauna time.', 'good');
     } else {
       // ad-hoc lift: record it as an extra so streak/week view see it

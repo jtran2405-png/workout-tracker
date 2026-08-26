@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   weekNumber, phaseFor, setsFor, repRange, suggestNextWeight,
   canLift, plungeWarning, sparringMode, WEEK_TEMPLATE, LIFTS,
-  mondayOfWeek, addDays, runPace,
+  mondayOfWeek, addDays, runPace, slotsFor,
 } from '../src/program.js';
 
 describe('week numbering (week 1 = Mon 2026-08-17)', () => {
@@ -123,11 +123,16 @@ describe('day rules', () => {
 });
 
 describe('template shape', () => {
-  it('four lifting days with the right templates', () => {
-    expect(WEEK_TEMPLATE[1].pm.lift).toBe('LOWER');
-    expect(WEEK_TEMPLATE[2].pm.lift).toBe('UPPER_A');
-    expect(WEEK_TEMPLATE[4].pm.lift).toBe('POSTERIOR');
-    expect(WEEK_TEMPLATE[5].pm.lift).toBe('UPPER_B');
+  it('four lifting days, AM slot, with the right templates', () => {
+    expect(WEEK_TEMPLATE[1].am.lift).toBe('LOWER');
+    expect(WEEK_TEMPLATE[2].am.lift).toBe('UPPER_A');
+    expect(WEEK_TEMPLATE[4].am.lift).toBe('POSTERIOR');
+    expect(WEEK_TEMPLATE[5].am.lift).toBe('FRIDAY_AB');
+  });
+  it('Friday alternates: odd weeks aesthetics, even weeks athletic', () => {
+    expect(slotsFor('2026-08-21').am.lift).toBe('UPPER_B');   // week 1 (odd) → pump
+    expect(slotsFor('2026-08-28').am.lift).toBe('ATHLETIC');  // week 2 (even) → power
+    expect(slotsFor('2026-09-04').am.lift).toBe('UPPER_B');   // week 3
   });
   it('every template exercise has a valid rep range', () => {
     for (const lift of Object.values(LIFTS)) {

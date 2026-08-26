@@ -77,10 +77,14 @@ export function renderWeek(root, ctx) {
   for (const wd of dayOrder) {
     const tpl = { ...slotsFor(addDays(monday, dayOrder.indexOf(wd))) };
     const name = DAY_ABBR[wd];
-    if (tpl.pm?.type === 'lift') {
-      const lift = LIFTS[tpl.pm.lift];
+    const liftSlot = tpl.am?.type === 'lift' ? 'am' : (tpl.pm?.type === 'lift' ? 'pm' : null);
+    if (liftSlot) {
+      const lift = LIFTS[tpl[liftSlot].lift];
+      const other = liftSlot === 'am'
+        ? (tpl.pm ? `PM ${tpl.pm.label}` : '')
+        : (tpl.am ? `AM ${tpl.am.label}` : '');
       const det = h('details', { class: 'split' },
-        h('summary', {}, `${name} — AM ${tpl.am.label} · PM ${lift.title}`),
+        h('summary', {}, `${name} — ${liftSlot.toUpperCase()} ${lift.title}${other ? ` · ${other}` : ''}`),
       );
       for (const ex of lift.exercises) {
         det.append(h('div', { class: 'ex-line' },

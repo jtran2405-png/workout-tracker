@@ -67,18 +67,20 @@ export function buildCoachReport(doc, week, today = todayStr()) {
     const tpl = slotsFor(date);
     const d = doc.days[date];
     const parts = [];
-    if (tpl.am) parts.push(`AM ${d?.amDone ? '✓' : '✗'} ${tpl.am.label}`);
-    if (tpl.pm) {
-      let label = tpl.pm.type === 'lift' ? `${LIFTS[tpl.pm.lift].title} lift` : tpl.pm.label;
-      if (tpl.pm.type === 'lift') {
-        const sess = doc.sessions[`${date}:PM`];
-        const mains = LIFTS[tpl.pm.lift].exercises.filter((e) => e.main).map((e) => {
+    for (const slot of ['am', 'pm']) {
+      const spec = tpl[slot];
+      if (!spec) continue;
+      const isDone = slot === 'am' ? d?.amDone : d?.pmDone;
+      let label = spec.type === 'lift' ? `${LIFTS[spec.lift].title} lift` : spec.label;
+      if (spec.type === 'lift') {
+        const sess = doc.sessions[`${date}:${slot.toUpperCase()}`];
+        const mains = LIFTS[spec.lift].exercises.filter((e) => e.main).map((e) => {
           const t = topSet(sess?.exercises?.[e.name]);
           return t ? `${e.name} ${t}` : null;
         }).filter(Boolean);
         if (mains.length) label += ` (${mains.join(', ')})`;
       }
-      parts.push(`PM ${d?.pmDone ? '✓' : '✗'} ${label}`);
+      parts.push(`${slot.toUpperCase()} ${isDone ? '✓' : '✗'} ${label}`);
     }
     const xt = doc.sessions[`${date}:XT`];
     const xtTitle = xt ? LIFTS[xt.template].title : null;

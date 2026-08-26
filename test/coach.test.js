@@ -18,8 +18,8 @@ function week1Doc() {
     recovery: { sauna: false, plunge: false },
     amDone: true, pmDone: false, sparringNotes: null,
   };
-  doc.sessions['2026-08-17:PM'] = {
-    date: '2026-08-17', slot: 'PM', template: 'LOWER', status: 'done',
+  doc.sessions['2026-08-17:AM'] = {
+    date: '2026-08-17', slot: 'AM', template: 'LOWER', status: 'done',
     exercises: { 'Back squat': [{ weight: 60, reps: 8, done: true }, { weight: 60, reps: 8, done: true }, { weight: 60, reps: 8, done: true }] },
   };
   return doc;
@@ -41,7 +41,7 @@ describe('coach report', () => {
     expect(report).toContain('Protein target hit: 2/2 days · Junk: 1 · Ate late: 0');
   });
   it('lists training days with main-lift top sets and extras', () => {
-    expect(report).toContain('Mon 08-17: AM ✓ 25 min easy cardio + mobility · PM ✓ Lower lift (Back squat 60kg×8,8,8)');
+    expect(report).toContain('Mon 08-17: AM ✓ Lower · power lift (Back squat 60kg×8,8,8) · PM ✓ 25 min easy Z2 + mobility (evening ok)');
     expect(report).toContain('+ Muay Thai 45min (light drills)');
     expect(report).toContain('Recovery: sauna ×1, plunge ×0');
   });

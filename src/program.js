@@ -80,40 +80,49 @@ export function sparringMode(week) {
 
 export const LIFTS = {
   LOWER: {
-    title: 'Lower',
+    title: 'Lower · power',
     exercises: [
+      { name: 'Box jump', low: 3, high: 3, sets: 3, note: 'low box, stick the landing, full rest' },
       { name: 'Back squat', low: 6, high: 8, main: true },
       { name: 'Romanian deadlift', low: 8, high: 8 },
-      { name: 'Leg press', low: 12, high: 12 },
-      { name: 'Leg curl', low: 12, high: 12 },
+      { name: 'Bulgarian split squat', low: 8, high: 8, note: 'per leg — balance under load' },
       { name: 'Standing calf raise', low: 12, high: 12, sets: 4 },
-      { name: 'Cable crunch', low: 15, high: 15 },
+      { name: 'Landmine rotation', low: 10, high: 10, note: 'per side, controlled' },
     ],
   },
   UPPER_A: {
     title: 'Upper push/pull',
     exercises: [
+      { name: 'Med-ball chest pass', low: 5, high: 5, sets: 3, note: 'explosive intent, full rest' },
       { name: 'Bench press', low: 6, high: 8, main: true, note: 'flat DB bench if no machine/bar free' },
       { name: 'Lat pulldown', low: 8, high: 10, note: 'or assisted pull-up' },
       { name: 'Seated cable row', low: 10, high: 10 },
-      { name: 'DB shoulder press', low: 10, high: 10 },
-      { name: 'Cable lateral raise', low: 15, high: 15 },
+      { name: 'Landmine punch press', low: 6, high: 6, note: 'per side, fight stance' },
       { name: 'Neck work', low: 15, high: 15 },
     ],
   },
   POSTERIOR: {
-    title: 'Posterior chain + arms',
+    title: 'Posterior · power',
     exercises: [
+      { name: 'Med-ball rotational slam', low: 5, high: 5, sets: 3, note: 'per side — throw violently, full rest' },
       { name: 'Deadlift', low: 5, high: 5, main: true, note: 'trap bar or conventional' },
       { name: 'Hip thrust', low: 10, high: 10 },
       { name: 'Chest-supported row', low: 12, high: 12 },
-      { name: 'Barbell/cable curl', low: 12, high: 12 },
-      { name: 'Rope triceps pushdown', low: 12, high: 12 },
       { name: "Farmer's carry", low: 3, high: 3, unitLabel: 'trips' },
     ],
   },
+  ATHLETIC: {
+    title: 'Athletic upper (power)',
+    exercises: [
+      { name: 'Med-ball chest pass', low: 5, high: 5, sets: 3, note: 'explosive intent, full rest' },
+      { name: 'Landmine punch press', low: 6, high: 6, main: true, note: 'per side, fight stance' },
+      { name: 'Sled push', low: 1, high: 1, sets: 6, unitLabel: 'trips', note: '20 m, fast, walk-back rest' },
+      { name: 'Med-ball rotational slam', low: 8, high: 8, note: 'per side' },
+      { name: 'Chin-up', low: 6, high: 8 },
+    ],
+  },
   UPPER_B: {
-    title: 'Upper + arms',
+    title: 'Upper + arms (aesthetics)',
     exercises: [
       { name: 'Incline DB press', low: 6, high: 8, main: true },
       { name: 'Chin-up', low: 8, high: 10 },
@@ -192,25 +201,33 @@ export const LIFTS = {
 };
 
 // Weekly template keyed by weekday (0=Sun..6=Sat).
+// Lifts run in the AM (Justin's preferred slot); easy cardio / bag work moves
+// to the PM (post-sunset — the HCMC heat rule applies to daylight cardio).
+// Friday alternates by week parity: odd = aesthetics (UPPER_B), even = ATHLETIC.
 export const WEEK_TEMPLATE = {
-  1: { am: { type: 'cardio', label: '25 min easy cardio + mobility' }, pm: { type: 'lift', lift: 'LOWER', after: 'sauna' } },
-  2: { am: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' }, pm: { type: 'lift', lift: 'UPPER_A', after: 'sauna' } },
-  3: { am: { type: 'cardio', label: '30 min walk' },                   pm: { type: 'recovery', label: 'Sauna + cold plunge + mobility' } },
-  4: { am: { type: 'cardio', label: '25 min easy cardio' },            pm: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' } },
-  5: { am: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' }, pm: { type: 'lift', lift: 'UPPER_B', after: 'sauna' } },
+  1: { am: { type: 'lift', lift: 'LOWER', after: 'sauna' },      pm: { type: 'cardio', label: '25 min easy Z2 + mobility (evening ok)' } },
+  2: { am: { type: 'lift', lift: 'UPPER_A', after: 'sauna' },    pm: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' } },
+  3: { am: { type: 'cardio', label: '30 min walk' },             pm: { type: 'recovery', label: 'Sauna + cold plunge + mobility' } },
+  4: { am: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' },  pm: { type: 'cardio', label: '25 min easy Z2' } },
+  5: { am: { type: 'lift', lift: 'FRIDAY_AB', after: 'sauna' },  pm: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' } },
   6: { am: { type: 'freestyle', label: 'Freestyle — spar / lift / Zone 2' }, pm: { type: 'recovery', label: 'Cold plunge (skip if you lifted)' } },
-  0: { am: null,                                                       pm: { type: 'sparring', label: 'Sparring 16:00' } },
+  0: { am: null,                                                 pm: { type: 'sparring', label: 'Sparring 16:00' } },
 };
 
 export function slotsFor(dateStr) {
-  return WEEK_TEMPLATE[weekdayOf(dateStr)];
+  const t = WEEK_TEMPLATE[weekdayOf(dateStr)];
+  if (t.am?.lift === 'FRIDAY_AB') {
+    const aesthetics = weekNumber(dateStr) % 2 === 1; // odd weeks: pump Friday
+    return { ...t, am: { ...t.am, lift: aesthetics ? 'UPPER_B' : 'ATHLETIC' } };
+  }
+  return t;
 }
 
 // ---------- day rules ----------
 
 export function isLiftingDay(dateStr) {
   const t = slotsFor(dateStr);
-  return t.pm?.type === 'lift';
+  return t.am?.type === 'lift' || t.pm?.type === 'lift';
 }
 
 // Wednesday is a hard no-lift day; weekends have no lift slot either.
