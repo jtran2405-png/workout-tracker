@@ -50,6 +50,21 @@ describe('coach report', () => {
   });
 });
 
+describe('coach report — wednesday recovery program', () => {
+  it('shows checklist progress', () => {
+    const doc = week1Doc();
+    doc.days['2026-08-19'] = {
+      wake: null, bedtime: null, sleepHours: null, bodyWeight: null,
+      weed: [], extras: [], food: { protein: false, junk: false, late: false, note: '' },
+      recovery: { sauna: true, plunge: true },
+      recoveryChecks: { bands: true, hips: true },
+      amDone: true, pmDone: false, sparringNotes: null,
+    };
+    const r = buildCoachReport(doc, 1, '2026-08-19');
+    expect(r).toContain('Recovery program (program 4/7)');
+  });
+});
+
 describe('coach report — baseline week 0', () => {
   it('covers the current calendar week and skips pre-start days', () => {
     const doc = emptyDoc();

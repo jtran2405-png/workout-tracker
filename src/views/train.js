@@ -4,7 +4,7 @@
 import {
   todayStr, addDays, weekdayOf, weekNumber, phaseFor, PHASE_INFO, DAY_NAMES,
   slotsFor, LIFTS, setsFor, repRange, repTargetLabel, suggestNextWeight,
-  sparringMode, parseDate, runPace,
+  sparringMode, parseDate, runPace, RECOVERY_PROGRAM,
 } from '../program.js';
 import { getDay, getSession, sessionKey, lastSetsFor } from '../store.js';
 import { h, toast, nowTime } from '../ui.js';
@@ -102,7 +102,10 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
     card.append(liftBody(ctx, date, day, spec.lift, phase, slot));
     card.append(h('p', { class: 'sub', style: 'margin-top:12px' }, '→ sauna after (always fine post-lift)'));
   } else if (spec.type === 'recovery' && weekdayOf(date) === 3) {
-    card.append(h('p', { class: 'sub' }, 'Hard no-lift day. Sauna, cold plunge, mobility — let the tissue rebuild.'));
+    card.append(
+      h('p', { class: 'sub', style: 'margin-bottom:10px' }, 'Hard no-lift day. Tick them off — recovery is training too.'),
+      recoveryChecklist(ctx, day),
+    );
   } else if (spec.type === 'freestyle') {
     card.append(
       h('p', { class: 'sub', style: 'margin-bottom:8px' },
@@ -156,6 +159,44 @@ function adhocCard(ctx, date, day, phase) {
       onclick: () => { getSession(doc, date, 'XT', k); ctx.save(); ctx.refresh(); },
     }, `+ Start ${LIFTS[k].title.toLowerCase()}`)),
   );
+}
+
+// ---------- wednesday recovery checklist ----------
+
+function recoveryChecklist(ctx, day) {
+  const isOn = (item) => (item.store === 'recovery' ? !!day.recovery[item.key] : !!day.recoveryChecks[item.key]);
+  const setOn = (item, v) => {
+    if (item.store === 'recovery') day.recovery[item.key] = v;
+    else day.recoveryChecks[item.key] = v;
+  };
+  const wrap = h('div', { class: 'rec-list' });
+  const render = () => {
+    wrap.innerHTML = '';
+    for (const item of RECOVERY_PROGRAM) {
+      const on = isOn(item);
+      wrap.append(h('button', {
+        class: `rec-item${on ? ' on' : ''}`,
+        onclick: () => {
+          setOn(item, !on);
+          ctx.save();
+          if (RECOVERY_PROGRAM.every(isOn) && !day.pmDone) {
+            day.pmDone = true;
+            ctx.save();
+            toast('Recovery day complete 🧘 Tissue rebuilt.', 'good');
+            ctx.refresh();
+            return;
+          }
+          render();
+        },
+      },
+        h('span', { class: 'rec-check' }, on ? '✓' : ''),
+        h('span', { class: 'rec-name' }, item.name),
+        h('span', { class: 'rec-target' }, item.target),
+      ));
+    }
+  };
+  render();
+  return wrap;
 }
 
 // ---------- lift logging ----------

@@ -3,7 +3,7 @@
 
 import {
   addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
-  slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb,
+  slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb, RECOVERY_PROGRAM,
 } from './program.js';
 import { currentStreak, weekAdherence } from './grit.js';
 
@@ -72,6 +72,10 @@ export function buildCoachReport(doc, week, today = todayStr()) {
       if (!spec) continue;
       const isDone = slot === 'am' ? d?.amDone : d?.pmDone;
       let label = spec.type === 'lift' ? `${LIFTS[spec.lift].title} lift` : spec.label;
+      if (spec.type === 'recovery' && weekdayOf(date) === 3) {
+        const on = RECOVERY_PROGRAM.filter((item) => (item.store === 'recovery' ? d?.recovery?.[item.key] : d?.recoveryChecks?.[item.key])).length;
+        label += ` (program ${on}/${RECOVERY_PROGRAM.length})`;
+      }
       if (spec.type === 'lift') {
         const sess = doc.sessions[`${date}:${slot.toUpperCase()}`];
         const mains = LIFTS[spec.lift].exercises.filter((e) => e.main).map((e) => {

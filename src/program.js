@@ -207,7 +207,7 @@ export const LIFTS = {
 export const WEEK_TEMPLATE = {
   1: { am: { type: 'lift', lift: 'LOWER', after: 'sauna' },      pm: { type: 'cardio', label: '25 min easy Z2 + mobility (evening ok)' } },
   2: { am: { type: 'lift', lift: 'UPPER_A', after: 'sauna' },    pm: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' } },
-  3: { am: { type: 'cardio', label: '30 min walk' },             pm: { type: 'recovery', label: 'Sauna + cold plunge + mobility' } },
+  3: { am: { type: 'cardio', label: 'Incline walk 30 min · 10–12% · easy' }, pm: { type: 'recovery', label: 'Recovery program' } },
   4: { am: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' },  pm: { type: 'cardio', label: '25 min easy Z2' } },
   5: { am: { type: 'lift', lift: 'FRIDAY_AB', after: 'sauna' },  pm: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' } },
   6: { am: { type: 'freestyle', label: 'Freestyle — spar / lift / Zone 2' }, pm: { type: 'recovery', label: 'Cold plunge (skip if you lifted)' } },
@@ -245,6 +245,18 @@ export function plungeWarning(dateStr, day = null, doc = null) {
   if (!isLiftingDay(dateStr) && !liftedAdhoc) return null;
   return 'You lifted today — a cold plunge within ~4 hours of lifting blunts muscle adaptation. Sauna is fine; plunge on non-lifting days.';
 }
+
+// Wednesday PM checklist. Items with store:'recovery' read/write the same
+// day.recovery flags as the Health tab chips; the rest live in day.recoveryChecks.
+export const RECOVERY_PROGRAM = [
+  { key: 'sauna', store: 'recovery', name: 'Sauna', target: '15–20 min' },
+  { key: 'plunge', store: 'recovery', name: 'Cold plunge', target: '2–4 min — allowed today' },
+  { key: 'bands', name: 'Band shoulder work', target: 'pass-throughs + pull-aparts 2×15' },
+  { key: 'hips', name: 'Hip flexor + couch stretch', target: '2 min per side' },
+  { key: 'hams', name: 'Hamstring + calf stretch', target: '2 min per side' },
+  { key: 'roll', name: 'Foam roll', target: 'quads · back · IT band, 5 min' },
+  { key: 'neck', name: 'Neck + wrist mobility', target: '2–3 min' },
+];
 
 // "6:41/km" from distance + duration; null when either is missing
 export function runPace(km, minutes) {
