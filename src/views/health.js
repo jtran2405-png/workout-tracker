@@ -125,7 +125,7 @@ export function renderHealth(root, ctx) {
       class: 'btn btn-ghost', style: 'width:100%',
       onclick: () => { day.weed.push({ time: nowTime(), note: '' }); ctx.save(); ctx.refresh(); },
     }, `+ log session${day.weed.length ? ` (${day.weed.length} today)` : ''}`),
-    h('p', { class: 'sub', style: 'margin-top:8px' }, 'Rule: never before training · last session ≥2 h before bed. Log every one — the attest tick means this list is complete.'),
+    h('p', { class: 'sub', style: 'margin-top:8px' }, 'Rule: never before training · last session ≥3 h before bed (REM protection). Log every one — the attest tick means this list is complete.'),
   ));
 
   // ---- recovery ----

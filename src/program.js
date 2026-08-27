@@ -113,6 +113,7 @@ export const LIFTS = {
   },
   ATHLETIC: {
     title: 'Athletic upper (power)',
+    adhoc: true, // Saturday-freestyle material; anchors conditioning day from week 5
     exercises: [
       { name: 'Med-ball chest pass', low: 5, high: 5, sets: 3, note: 'explosive intent, full rest' },
       { name: 'Landmine punch press', low: 6, high: 6, main: true, note: 'per side, fight stance' },
@@ -209,18 +210,17 @@ export const WEEK_TEMPLATE = {
   2: { am: { type: 'lift', lift: 'UPPER_A', after: 'sauna' },    pm: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' } },
   3: { am: { type: 'cardio', label: 'Incline walk 30 min · 10–12% · easy' }, pm: { type: 'recovery', label: 'Recovery program' } },
   4: { am: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' },  pm: { type: 'cardio', label: '25 min easy Z2' } },
-  5: { am: { type: 'lift', lift: 'FRIDAY_AB', after: 'sauna' },  pm: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' } },
+  5: { am: { type: 'lift', lift: 'UPPER_B', after: 'sauna' },    pm: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' } },
   6: { am: { type: 'freestyle', label: 'Freestyle — spar / lift / Zone 2' }, pm: { type: 'recovery', label: 'Cold plunge (skip if you lifted)' } },
   0: { am: null,                                                 pm: { type: 'sparring', label: 'Sparring 16:00' } },
 };
 
+// Expert-panel revision (Aug 27): Friday is aesthetics EVERY week — biweekly
+// arm/delt work was ~1.5 direct sets/wk, far under the hypertrophy minimum.
+// ATHLETIC lives on as an ad-hoc template; its content anchors Saturday
+// conditioning from week 5.
 export function slotsFor(dateStr) {
-  const t = WEEK_TEMPLATE[weekdayOf(dateStr)];
-  if (t.am?.lift === 'FRIDAY_AB') {
-    const aesthetics = weekNumber(dateStr) % 2 === 1; // odd weeks: pump Friday
-    return { ...t, am: { ...t.am, lift: aesthetics ? 'UPPER_B' : 'ATHLETIC' } };
-  }
-  return t;
+  return WEEK_TEMPLATE[weekdayOf(dateStr)];
 }
 
 // ---------- day rules ----------

@@ -127,12 +127,11 @@ describe('template shape', () => {
     expect(WEEK_TEMPLATE[1].am.lift).toBe('LOWER');
     expect(WEEK_TEMPLATE[2].am.lift).toBe('UPPER_A');
     expect(WEEK_TEMPLATE[4].am.lift).toBe('POSTERIOR');
-    expect(WEEK_TEMPLATE[5].am.lift).toBe('FRIDAY_AB');
+    expect(WEEK_TEMPLATE[5].am.lift).toBe('UPPER_B');
   });
-  it('Friday alternates: odd weeks aesthetics, even weeks athletic', () => {
-    expect(slotsFor('2026-08-21').am.lift).toBe('UPPER_B');   // week 1 (odd) → pump
-    expect(slotsFor('2026-08-28').am.lift).toBe('ATHLETIC');  // week 2 (even) → power
-    expect(slotsFor('2026-09-04').am.lift).toBe('UPPER_B');   // week 3
+  it('Friday is aesthetics every week; ATHLETIC is ad-hoc for Saturdays', () => {
+    expect(slotsFor('2026-08-28').am.lift).toBe('UPPER_B');
+    expect(LIFTS.ATHLETIC.adhoc).toBe(true);
   });
   it('every template exercise has a valid rep range', () => {
     for (const lift of Object.values(LIFTS)) {
