@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isNonZeroDay, currentStreak, weekAdherence } from '../src/grit.js';
+import { isNonZeroDay, currentStreak, weekAdherence, dailies, disciplineWeek } from '../src/grit.js';
 import { emptyDoc } from '../src/store.js';
 
 const day = (patch = {}) => ({
@@ -50,6 +50,23 @@ describe('streak', () => {
     doc.days['2026-08-17'] = day({ amDone: true });
     doc.days['2026-08-18'] = day({ amDone: true });
     expect(currentStreak(doc, '2026-08-18')).toBe(2);
+  });
+});
+
+describe('dailies (strict mode)', () => {
+  it('derives weigh/sleep/protein and requires the attest tick', () => {
+    const full = day({ bodyWeight: 62, sleepHours: 7.5, food: { protein: true, junk: false, late: false, note: '' }, attest: true });
+    expect(dailies(full).every((x) => x.done)).toBe(true);
+    const noAttest = day({ bodyWeight: 62, sleepHours: 7.5, food: { protein: true, junk: false, late: false, note: '' } });
+    expect(dailies(noAttest).filter((x) => x.done)).toHaveLength(3);
+    expect(dailies(undefined).some((x) => x.done)).toBe(false);
+  });
+  it('discipline week counts 4-for-4 days since startDate', () => {
+    const doc = emptyDoc();
+    doc.days['2026-08-17'] = day({ bodyWeight: 62, sleepHours: 7, food: { protein: true, junk: false, late: false, note: '' }, attest: true });
+    doc.days['2026-08-18'] = day({ bodyWeight: 62 });
+    const dl = disciplineWeek(doc, '2026-08-18');
+    expect(dl).toEqual({ full: 1, days: 5 }); // Fri 14 → Tue 18
   });
 });
 

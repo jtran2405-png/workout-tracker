@@ -85,7 +85,23 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
   const doneKey = slot === 'AM' ? 'amDone' : 'pmDone';
   const toggle = h('button', {
     class: `done-toggle${day[doneKey] ? ' on' : ''}`,
-    onclick: () => { day[doneKey] = !day[doneKey]; ctx.save(); ctx.refresh(); },
+    onclick: () => {
+      // strict mode: a lift tick must be earned — every planned set logged
+      if (!day[doneKey] && spec.type === 'lift') {
+        const sess = ctx.doc.sessions[sessionKey(date, slot)];
+        const complete = !!sess && LIFTS[spec.lift].exercises.every((ex) => {
+          const arr = sess.exercises?.[ex.name] || [];
+          return arr.filter((s) => s.done).length >= setsFor(ex, phase);
+        });
+        if (!complete) {
+          toast('Strict mode: log every set first — the tick is earned.', 'warn');
+          return;
+        }
+      }
+      day[doneKey] = !day[doneKey];
+      ctx.save();
+      ctx.refresh();
+    },
   }, day[doneKey] ? '✓ Done' : 'Done?');
 
   const card = h('div', { class: 'card' },

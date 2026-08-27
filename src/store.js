@@ -60,6 +60,7 @@ export function getDay(doc, date) {
   if (!d.food) d.food = { protein: false, junk: false, late: false, note: '' };
   if (!d.recovery) d.recovery = { sauna: false, plunge: false };
   if (!d.recoveryChecks) d.recoveryChecks = {};
+  if (d.attest === undefined) d.attest = false;
   return d;
 }
 

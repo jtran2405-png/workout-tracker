@@ -3,8 +3,8 @@
 
 import { todayStr, addDays, parseDate, DAY_NAMES, weekNumber, plungeWarning } from '../program.js';
 import { getDay } from '../store.js';
-import { h, confirmDialog, nowTime } from '../ui.js';
-import { isNonZeroDay, currentStreak, weekAdherence } from '../grit.js';
+import { h, confirmDialog, nowTime, toast } from '../ui.js';
+import { isNonZeroDay, currentStreak, weekAdherence, dailies } from '../grit.js';
 
 function prettyDate(dateStr) {
   const d = parseDate(dateStr);
@@ -35,9 +35,13 @@ export function renderHealth(root, ctx) {
     h('div', { class: 'grit-banner' },
       h('div', { class: 'grit-item' }, h('span', { class: 'grit-num' }, String(streak)), h('span', { class: 'grit-label' }, streak === 1 ? 'day streak' : 'day streak')),
       h('div', { class: 'grit-item' }, h('span', { class: 'grit-num' }, adh.pct != null ? `${adh.pct}%` : '—'), h('span', { class: 'grit-label' }, `adherence (${adh.done}/${adh.planned})`)),
-      h('div', { class: 'grit-item' },
-        h('span', { class: `grit-num ${isNonZeroDay(getDay(doc, todayStr()), todayStr(), doc) ? 'grit-good' : 'grit-bad'}` }, isNonZeroDay(getDay(doc, todayStr()), todayStr(), doc) ? '✓' : '·'),
-        h('span', { class: 'grit-label' }, 'showed up today')),
+      (() => {
+        const dl = dailies(getDay(doc, todayStr()));
+        const n = dl.filter((x) => x.done).length;
+        return h('div', { class: 'grit-item' },
+          h('span', { class: `grit-num ${n === dl.length ? 'grit-good' : ''}` }, `${n}/${dl.length}`),
+          h('span', { class: 'grit-label' }, 'dailies today'));
+      })(),
     ),
     h('p', { class: 'sub', style: 'margin: -4px 2px 12px; font-size: 12.5px; color: var(--muted)' },
       isToday ? prettyDate(date) : `Editing ${prettyDate(date)}`),
@@ -45,6 +49,31 @@ export function renderHealth(root, ctx) {
 
   const num = (v) => (v === '' ? null : Number(v));
   const habit = (label, input) => h('div', { class: 'habit' }, h('label', {}, label), input);
+
+  // ---- dailies (strict mode: the four non-negotiables) ----
+  const dl = dailies(day);
+  root.append(h('div', { class: 'card' },
+    h('h2', {}, 'Dailies — non-negotiable'),
+    h('div', { class: 'rec-list' },
+      ...dl.map((item) => h('button', {
+        class: `rec-item${item.done ? ' on' : ''}`,
+        onclick: () => {
+          if (item.key === 'attest') {
+            day.attest = !day.attest;
+            ctx.save();
+            ctx.refresh();
+          } else if (!item.done) {
+            const hint = { weigh: 'Enter weight below', sleep: 'Enter sleep hours below', protein: 'Tick the protein chip below' }[item.key];
+            toast(hint, 'warn');
+          }
+        },
+      },
+        h('span', { class: 'rec-check' }, item.done ? '✓' : ''),
+        h('span', { class: 'rec-name' }, item.label),
+        item.key === 'attest' ? h('span', { class: 'rec-target' }, 'everything above is true') : null,
+      )),
+    ),
+  ));
 
   // ---- sleep & weight ----
   root.append(h('div', { class: 'card' },
@@ -96,6 +125,7 @@ export function renderHealth(root, ctx) {
       class: 'btn btn-ghost', style: 'width:100%',
       onclick: () => { day.weed.push({ time: nowTime(), note: '' }); ctx.save(); ctx.refresh(); },
     }, `+ log session${day.weed.length ? ` (${day.weed.length} today)` : ''}`),
+    h('p', { class: 'sub', style: 'margin-top:8px' }, 'Rule: never before training · last session ≥2 h before bed. Log every one — the attest tick means this list is complete.'),
   ));
 
   // ---- recovery ----

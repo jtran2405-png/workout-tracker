@@ -5,7 +5,7 @@ import {
   addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
   slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb, RECOVERY_PROGRAM,
 } from './program.js';
-import { currentStreak, weekAdherence } from './grit.js';
+import { currentStreak, weekAdherence, dailies } from './grit.js';
 
 function topSet(sets) {
   const done = (sets || []).filter((s) => s.done && s.weight != null);
@@ -25,6 +25,18 @@ export function buildCoachReport(doc, week, today = todayStr()) {
 
   L.push(`# Coach report — Week ${week} (${monday} → ${sunday})`);
   L.push(`Phase: ${PHASE_INFO[phase].label} · Streak: ${streak} days · Adherence: ${adh.done}/${adh.planned} slots${adh.pct != null ? ` (${adh.pct}%)` : ''}`);
+  {
+    let full = 0;
+    let elapsed = 0;
+    for (let i = 0; i < 7; i++) {
+      const date = addDays(monday, i);
+      if (date > today) break;
+      if (doc.settings.startDate && date < doc.settings.startDate) continue;
+      elapsed++;
+      if (dailies(doc.days[date]).every((x) => x.done)) full++;
+    }
+    L.push(`Dailies (weigh·sleep·protein·honest-log): ${full}/${elapsed} days 4-for-4`);
+  }
 
   // ---- body ----
   const days = [];

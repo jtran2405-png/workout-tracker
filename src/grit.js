@@ -27,6 +27,31 @@ export function currentStreak(doc, today = todayStr()) {
   return streak;
 }
 
+// Strict-mode dailies: the four non-negotiables, every day.
+// weigh/sleep/protein derive from the day's data; 'attest' is Justin's
+// explicit "everything logged today is true" signature.
+export function dailies(day) {
+  return [
+    { key: 'weigh', label: 'Weigh-in', done: day?.bodyWeight != null },
+    { key: 'sleep', label: 'Sleep logged', done: day?.sleepHours != null },
+    { key: 'protein', label: 'Protein hit', done: !!day?.food?.protein },
+    { key: 'attest', label: 'Honest log', done: !!day?.attest },
+  ];
+}
+
+export function disciplineWeek(doc, today = todayStr()) {
+  let full = 0;
+  let days = 0;
+  for (let i = 0; i < 7; i++) {
+    const date = addDays(today, -i);
+    if (date > today) continue;
+    if (doc.settings.startDate && date < doc.settings.startDate) continue;
+    days++;
+    if (dailies(doc.days[date]).every((x) => x.done)) full++;
+  }
+  return { full, days };
+}
+
 // Adherence for a program week: completed planned slots / elapsed planned slots.
 // Days before today count in full; today's slots count only once done
 // (an unfinished today is pending, not missed).

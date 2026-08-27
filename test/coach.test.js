@@ -34,6 +34,9 @@ describe('coach report', () => {
     expect(report).toContain('Streak: 2 days');
     expect(report).toContain('Adherence: 3/3 slots (100%)');
   });
+  it('grades the dailies', () => {
+    expect(report).toContain('Dailies (weigh·sleep·protein·honest-log): 0/2 days 4-for-4');
+  });
   it('summarizes body, weed and food flags', () => {
     expect(report).toContain('Weight: 79.2 → 79 kg (Δ -0.2)');
     expect(report).toContain('Sleep: avg 7.0h · 1 night(s) under 7h');
