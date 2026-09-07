@@ -82,6 +82,9 @@ export const LIFTS = {
   LOWER: {
     title: 'Lower · power',
     exercises: [
+      { name: 'WARMUP: 5–10 min easy cardio (bike/treadmill)', low: 1, high: 1, sets: 1, note: 'easy pace, get heart rate up' },
+      { name: 'WARMUP: Leg swings & hip circles', low: 1, high: 1, sets: 1, note: '10 each direction per leg' },
+      { name: 'WARMUP: Air squats', low: 10, high: 10, sets: 1, note: 'bodyweight, full range' },
       { name: 'Box jump', low: 3, high: 3, sets: 3, note: 'low box, stick the landing, full rest' },
       { name: 'Back squat', low: 6, high: 8, main: true },
       { name: 'Romanian deadlift', low: 8, high: 8 },
@@ -93,6 +96,9 @@ export const LIFTS = {
   UPPER_A: {
     title: 'Upper push/pull',
     exercises: [
+      { name: 'WARMUP: 5–10 min easy cardio (bike/rower)', low: 1, high: 1, sets: 1, note: 'easy pace' },
+      { name: 'WARMUP: Arm circles & band pull-aparts', low: 1, high: 1, sets: 1, note: '15 pull-aparts each direction' },
+      { name: 'WARMUP: Light rows', low: 8, high: 8, sets: 1, note: 'half load, groove the pattern' },
       { name: 'Med-ball chest pass', low: 5, high: 5, sets: 3, note: 'explosive intent, full rest' },
       { name: 'Bench press', low: 6, high: 8, main: true, note: 'flat DB bench if no machine/bar free' },
       { name: 'Lat pulldown', low: 8, high: 10, note: 'or assisted pull-up' },
@@ -104,6 +110,9 @@ export const LIFTS = {
   POSTERIOR: {
     title: 'Posterior · power',
     exercises: [
+      { name: 'WARMUP: 5–10 min easy cardio (bike/treadmill)', low: 1, high: 1, sets: 1, note: 'easy pace' },
+      { name: 'WARMUP: Cat-cow stretch', low: 1, high: 1, sets: 1, note: '10 reps, mobilize spine' },
+      { name: 'WARMUP: Light hip thrusts', low: 10, high: 10, sets: 1, note: 'bodyweight or light, groove hips' },
       { name: 'Med-ball rotational slam', low: 5, high: 5, sets: 3, note: 'per side — throw violently, full rest' },
       { name: 'Deadlift', low: 5, high: 5, main: true, note: 'trap bar or conventional' },
       { name: 'Hip thrust', low: 10, high: 10 },
@@ -120,6 +129,20 @@ export const LIFTS = {
       { name: 'Sled push', low: 1, high: 1, sets: 6, unitLabel: 'trips', note: '20 m, fast, walk-back rest' },
       { name: 'Med-ball rotational slam', low: 8, high: 8, note: 'per side' },
       { name: 'Chin-up', low: 6, high: 8 },
+    ],
+  },
+  CONDITIONING: {
+    title: 'Hard conditioning block (fighter prep)',
+    adhoc: true,
+    exercises: [
+      { name: 'WARMUP: 5–10 min easy cardio + dynamic mobility', low: 1, high: 1, sets: 1, note: 'bike/treadmill, arm circles, leg swings' },
+      { name: 'Landmine rotational punch throws', low: 5, high: 5, sets: 4, note: 'per side, full rest, max intent' },
+      { name: 'Med-ball floor slams', low: 6, high: 6, sets: 4, note: 'overhead to floor, full violence' },
+      { name: 'Med-ball rotational scoop toss', low: 5, high: 5, sets: 3, note: 'per side, throw sideways, chase it' },
+      { name: 'Jump squats', low: 5, high: 5, sets: 4, note: 'light DBs at sides ok, land soft' },
+      { name: 'KB swings, heavy', low: 8, high: 8, sets: 4, note: 'hip snap like a teep' },
+      { name: 'Broad jumps', low: 4, high: 4, sets: 3, note: 'stick the landing (or skip if no space)' },
+      { name: 'Engine circuit (2–3 × 3 min)', low: 1, high: 1, sets: 1, unitLabel: 'rounds', note: '30s slams → 30s swings → 30s jump lunges → 30s sprawls → 60s shadowbox, 1 min rest' },
     ],
   },
   UPPER_B: {
@@ -202,23 +225,23 @@ export const LIFTS = {
 };
 
 // Weekly template keyed by weekday (0=Sun..6=Sat).
-// Lifts run in the AM (Justin's preferred slot); easy cardio / bag work moves
-// to the PM (post-sunset — the HCMC heat rule applies to daylight cardio).
-// Friday alternates by week parity: odd = aesthetics (UPPER_B), even = ATHLETIC.
+// Fighter-first program: 3 lifts/wk (Mon/Tue/Thu) + hard conditioning (Fri) + sparring (Sat/Sun).
+// Lifts run in the AM (Justin's preference); conditioning/cardio in PM when needed.
+// HCMC heat rule: early morning for outdoor cardio; evening Z2 ok.
 export const WEEK_TEMPLATE = {
   1: { am: { type: 'lift', lift: 'LOWER', after: 'sauna' },      pm: { type: 'cardio', label: '25 min easy Z2 + mobility (evening ok)' } },
-  2: { am: { type: 'lift', lift: 'UPPER_A', after: 'sauna' },    pm: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' } },
+  2: { am: { type: 'lift', lift: 'UPPER_A', after: 'sauna' },    pm: { type: 'cardio', label: '25 min easy Z2 or light bag work' } },
   3: { am: { type: 'cardio', label: 'Incline walk 30 min · 10–12% · easy' }, pm: { type: 'recovery', label: 'Recovery program' } },
   4: { am: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' },  pm: { type: 'cardio', label: '25 min easy Z2' } },
-  5: { am: { type: 'lift', lift: 'UPPER_B', after: 'sauna' },    pm: { type: 'cardio', label: 'Bag rounds 5×3 min (or 25 min Z2)' } },
+  5: { am: { type: 'lift', lift: 'CONDITIONING' },                pm: null },
   6: { am: { type: 'freestyle', label: 'Freestyle — spar / lift / Zone 2' }, pm: { type: 'recovery', label: 'Cold plunge (skip if you lifted)' } },
-  0: { am: null,                                                 pm: { type: 'sparring', label: 'Sparring 16:00' } },
+  0: { am: null,                                                 pm: { type: 'sparring', label: 'Sparring' } },
 };
 
-// Expert-panel revision (Aug 27): Friday is aesthetics EVERY week — biweekly
-// arm/delt work was ~1.5 direct sets/wk, far under the hypertrophy minimum.
-// ATHLETIC lives on as an ad-hoc template; its content anchors Saturday
-// conditioning from week 5.
+// Fighter-base-building program (Sep 2026 onward):
+// Reduced lifts (3/wk) with explosive primers → hard conditioning Fri → sparring Sat/Sun.
+// UPPER_B (aesthetics) retired in favor of conditioning-first architecture.
+// Sleep + weed discipline are load-bearing: minimum 7 hrs/night, no sessions after 6pm.
 export function slotsFor(dateStr) {
   return WEEK_TEMPLATE[weekdayOf(dateStr)];
 }

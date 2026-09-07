@@ -33,7 +33,7 @@ export function currentStreak(doc, today = todayStr()) {
 export function dailies(day) {
   return [
     { key: 'weigh', label: 'Weigh-in', done: day?.bodyWeight != null },
-    { key: 'sleep', label: 'Sleep logged', done: day?.sleepHours != null },
+    { key: 'sleep', label: 'Sleep logged', done: (day?.sleepHours != null) || (day?.bedtime && day?.wake) },
     { key: 'protein', label: 'Protein hit', done: !!day?.food?.protein },
     { key: 'attest', label: 'Honest log', done: !!day?.attest },
   ];
