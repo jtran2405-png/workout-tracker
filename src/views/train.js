@@ -115,6 +115,21 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
   );
 
   if (spec.type === 'lift') {
+    // Recovery week guidance (Week 5+, back-pain protocol, or low-sleep days)
+    const isRecoveryWeek = week === 5 && parseDate(date) <= parseDate('2026-09-20');
+    if (isRecoveryWeek) {
+      card.append(h('div', { class: 'warn-note', style: 'margin: -4px 2px 12px' }, '🛑',
+        'RECOVERY WEEK: Use 50% load or form emphasis. Main lifts below — focus on mobility & control.'));
+      card.append(h('div', { style: 'font-size: 13px; color: var(--ink-2); margin: -8px 2px 12px; line-height: 1.4' },
+        h('strong', {}, 'Baseline loads (50% form work):'),
+        h('br', {}),
+        '• Back squat: 20 kg (was 40 kg)',
+        h('br', {}),
+        '• Bench press: 15 kg (was 30 kg)',
+        h('br', {}),
+        '• Posterior lifts: 20–25 kg (form only)',
+      ));
+    }
     card.append(liftBody(ctx, date, day, spec.lift, phase, slot));
     card.append(h('p', { class: 'sub', style: 'margin-top:12px' }, '→ sauna after (always fine post-lift)'));
   } else if (spec.type === 'recovery' && weekdayOf(date) === 3) {
