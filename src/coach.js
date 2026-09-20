@@ -4,6 +4,7 @@
 import {
   addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
   slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb, RECOVERY_PROGRAM,
+  sleepHoursOf,
 } from './program.js';
 import { currentStreak, weekAdherence, dailies } from './grit.js';
 
@@ -45,7 +46,7 @@ export function buildCoachReport(doc, week, today = todayStr()) {
     if (doc.days[date]) days.push({ date, d: doc.days[date] });
   }
   const weights = days.filter((x) => x.d.bodyWeight != null).map((x) => x.d.bodyWeight);
-  const sleeps = days.filter((x) => x.d.sleepHours != null).map((x) => x.d.sleepHours);
+  const sleeps = days.map((x) => sleepHoursOf(x.d)).filter((s) => s != null);
   const weedTotal = days.reduce((a, x) => a + (x.d.weed || []).length, 0);
   L.push('', '## Body');
   L.push(weights.length

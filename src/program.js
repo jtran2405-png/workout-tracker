@@ -27,6 +27,23 @@ export function fmtDate(d) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+// Sleep duration for a day, in hours.
+// The explicitly typed "Sleep h" number wins; otherwise derive it from the
+// Wake + Bedtime pickers, which is how the day is actually logged most days.
+// Bedtime → wake normally crosses midnight, so wrap into a 24 h window.
+export function sleepHoursOf(day) {
+  if (!day) return null;
+  if (day.sleepHours != null) return day.sleepHours;
+  if (!day.bedtime || !day.wake) return null;
+  const mins = (t) => {
+    const [hh, mm] = String(t).split(':').map(Number);
+    return Number.isFinite(hh) && Number.isFinite(mm) ? hh * 60 + mm : null;
+  };
+  const b = mins(day.bedtime), w = mins(day.wake);
+  if (b == null || w == null) return null;
+  return Math.round(((((w - b) % 1440) + 1440) % 1440) / 6) / 10;
+}
+
 export function todayStr() {
   return fmtDate(new Date());
 }

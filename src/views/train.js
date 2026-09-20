@@ -4,7 +4,7 @@
 import {
   todayStr, addDays, weekdayOf, weekNumber, phaseFor, PHASE_INFO, DAY_NAMES,
   slotsFor, LIFTS, setsFor, repRange, repTargetLabel, suggestNextWeight,
-  sparringMode, parseDate, runPace, RECOVERY_PROGRAM,
+  sparringMode, parseDate, runPace, RECOVERY_PROGRAM, sleepHoursOf,
 } from '../program.js';
 import { getDay, getSession, sessionKey, lastSetsFor } from '../store.js';
 import { h, toast, nowTime } from '../ui.js';
@@ -46,9 +46,10 @@ export function renderTrain(root, ctx) {
   );
 
   // readiness: Train reads Health
-  if (day.sleepHours != null && day.sleepHours < 6 && template.pm?.type === 'lift') {
+  const slept = sleepHoursOf(day);
+  if (slept != null && slept < 6 && template.pm?.type === 'lift') {
     root.append(h('div', { class: 'warn-note', style: 'margin: -4px 2px 12px' }, '⚠︎',
-      `${day.sleepHours}h sleep — show up anyway, but keep weights at last session's numbers and cut the last set if form slips.`));
+      `${slept}h sleep — show up anyway, but keep weights at last session's numbers and cut the last set if form slips.`));
   }
 
   // baseline week: the program hasn't started — no programmed lifting yet

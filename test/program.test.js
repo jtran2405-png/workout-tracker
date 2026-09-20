@@ -3,6 +3,7 @@ import {
   weekNumber, phaseFor, setsFor, repRange, suggestNextWeight,
   canLift, plungeWarning, sparringMode, WEEK_TEMPLATE, LIFTS,
   mondayOfWeek, addDays, runPace, slotsFor,
+  sleepHoursOf,
 } from '../src/program.js';
 
 describe('week numbering (week 1 = Mon 2026-08-17)', () => {
@@ -123,14 +124,15 @@ describe('day rules', () => {
 });
 
 describe('template shape', () => {
-  it('four lifting days, AM slot, with the right templates', () => {
+  it('four AM lift slots: three strength days plus Friday conditioning', () => {
     expect(WEEK_TEMPLATE[1].am.lift).toBe('LOWER');
     expect(WEEK_TEMPLATE[2].am.lift).toBe('UPPER_A');
     expect(WEEK_TEMPLATE[4].am.lift).toBe('POSTERIOR');
-    expect(WEEK_TEMPLATE[5].am.lift).toBe('UPPER_B');
+    expect(WEEK_TEMPLATE[5].am.lift).toBe('CONDITIONING');
   });
-  it('Friday is aesthetics every week; ATHLETIC is ad-hoc for Saturdays', () => {
-    expect(slotsFor('2026-08-28').am.lift).toBe('UPPER_B');
+  it('Friday is conditioning every week, AM only; ATHLETIC is ad-hoc for Saturdays', () => {
+    expect(slotsFor('2026-08-28').am.lift).toBe('CONDITIONING');
+    expect(WEEK_TEMPLATE[5].pm).toBeNull(); // hard conditioning day carries no PM slot
     expect(LIFTS.ATHLETIC.adhoc).toBe(true);
   });
   it('every template exercise has a valid rep range', () => {
@@ -144,5 +146,31 @@ describe('template shape', () => {
   it('addDays crosses month boundaries', () => {
     expect(addDays('2026-08-31', 1)).toBe('2026-09-01');
     expect(addDays('2026-09-01', -1)).toBe('2026-08-31');
+  });
+});
+
+// Regression: the coach report, progress charts and the <6h lift guard all read
+// `sleepHours` only, so nights logged with the Wake/Bedtime pickers were invisible
+// and reported as "no entries" even though the dailies tick counted them.
+describe('sleepHoursOf', () => {
+  it('derives hours from bedtime + wake across midnight', () => {
+    expect(sleepHoursOf({ bedtime: '23:00', wake: '07:00' })).toBe(8);
+    expect(sleepHoursOf({ bedtime: '23:30', wake: '06:00' })).toBe(6.5);
+    expect(sleepHoursOf({ bedtime: '22:15', wake: '05:45' })).toBe(7.5);
+  });
+
+  it('handles a post-midnight bedtime', () => {
+    expect(sleepHoursOf({ bedtime: '01:00', wake: '09:00' })).toBe(8);
+  });
+
+  it('prefers an explicitly entered sleepHours', () => {
+    expect(sleepHoursOf({ sleepHours: 5, bedtime: '23:00', wake: '07:00' })).toBe(5);
+  });
+
+  it('returns null when the night is genuinely unlogged', () => {
+    expect(sleepHoursOf({})).toBe(null);
+    expect(sleepHoursOf(null)).toBe(null);
+    expect(sleepHoursOf({ bedtime: '23:00' })).toBe(null);
+    expect(sleepHoursOf({ wake: '07:00' })).toBe(null);
   });
 });

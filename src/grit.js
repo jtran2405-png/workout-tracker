@@ -1,7 +1,7 @@
 // Accountability mechanics — pure functions, unit tested.
 // No-zero-day: any completed slot or extra session keeps the chain alive.
 
-import { addDays, todayStr, slotsFor, mondayOfWeek } from './program.js';
+import { addDays, todayStr, slotsFor, mondayOfWeek, sleepHoursOf } from './program.js';
 
 export function isNonZeroDay(day, date = null, doc = null) {
   if (!!day && (day.amDone || day.pmDone || (day.extras || []).length > 0)) return true;
@@ -33,7 +33,7 @@ export function currentStreak(doc, today = todayStr()) {
 export function dailies(day) {
   return [
     { key: 'weigh', label: 'Weigh-in', done: day?.bodyWeight != null },
-    { key: 'sleep', label: 'Sleep logged', done: (day?.sleepHours != null) || (day?.bedtime && day?.wake) },
+    { key: 'sleep', label: 'Sleep logged', done: sleepHoursOf(day) != null },
     { key: 'protein', label: 'Protein hit', done: !!day?.food?.protein },
     { key: 'attest', label: 'Honest log', done: !!day?.attest },
   ];

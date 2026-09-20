@@ -1,6 +1,6 @@
 import {
   todayStr, addDays, weekNumber, mondayOfWeek, phaseFor, LIFTS,
-  setsFor, repRange, suggestNextWeight, parseDate, kgLb,
+  setsFor, repRange, suggestNextWeight, parseDate, kgLb, sleepHoursOf,
 } from '../program.js';
 import { historyFor, lastSetsFor } from '../store.js';
 import { h, toast } from '../ui.js';
@@ -38,8 +38,8 @@ export function renderProgress(root, ctx) {
   const prevW = weekAgoDays.length ? doc.days[weekAgoDays[weekAgoDays.length - 1]].bodyWeight : null;
   const delta = latestW != null && prevW != null ? latestW - prevW : null;
 
-  const sleepDays = Object.keys(doc.days).filter((d) => doc.days[d].sleepHours != null && d > addDays(today, -7));
-  const avgSleep = sleepDays.length ? sleepDays.reduce((a, d) => a + doc.days[d].sleepHours, 0) / sleepDays.length : null;
+  const sleepDays = Object.keys(doc.days).filter((d) => sleepHoursOf(doc.days[d]) != null && d > addDays(today, -7));
+  const avgSleep = sleepDays.length ? sleepDays.reduce((a, d) => a + sleepHoursOf(doc.days[d]), 0) / sleepDays.length : null;
 
   // current calendar week, including week 0 (baseline) — never a future week
   const week = Math.max(0, weekNumber(today, doc.settings.week1Monday));
@@ -143,8 +143,8 @@ export function renderProgress(root, ctx) {
 
   // ---- sleep trend ----
   const sPoints = Object.keys(doc.days)
-    .filter((d) => doc.days[d].sleepHours != null).sort().slice(-30)
-    .map((d) => ({ label: shortDate(d), value: doc.days[d].sleepHours }));
+    .filter((d) => sleepHoursOf(doc.days[d]) != null).sort().slice(-30)
+    .map((d) => ({ label: shortDate(d), value: sleepHoursOf(doc.days[d]) }));
   root.append(h('div', { class: 'card' }, h('h2', {}, 'Sleep'),
     lineChart(sPoints, { unit: 'h', decimals: 1, height: 180, reference: { value: 7, label: '7h target' } })));
 }
