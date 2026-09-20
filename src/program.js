@@ -239,9 +239,15 @@ export const WEEK_TEMPLATE = {
 };
 
 // Fighter-base-building program (Sep 2026 onward):
+// Daily: 5k Z2 easy run (conversational pace, builds aerobic base, lowers ACWR)
 // Reduced lifts (3/wk) with explosive primers → hard conditioning Fri → sparring Sat/Sun.
 // UPPER_B (aesthetics) retired in favor of conditioning-first architecture.
 // Sleep + weed discipline are load-bearing: minimum 7 hrs/night, no sessions after 6pm.
+
+export const DAILY_BASE = {
+  am: { type: 'cardio', label: '5k Z2 easy run (conversational pace, heart rate down)' },
+};
+
 export function slotsFor(dateStr) {
   return WEEK_TEMPLATE[weekdayOf(dateStr)];
 }
