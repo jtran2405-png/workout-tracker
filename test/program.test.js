@@ -198,6 +198,21 @@ describe('template shape', () => {
     expect(DAILY_BASE.label).toMatch(/3–5k/); // 3–5k daily, not a fixed 5k
     expect(DAILY_BASE.lift).toBeUndefined(); // cardio, never routed through liftBody
   });
+  it('no weekday slot prescribes Zone 2 — that is the daily run\'s job', () => {
+    // Mon/Tue/Thu used to carry a 2nd Z2 block on top of DAILY_BASE, so the same
+    // aerobic work was planned twice and needed two ticks on the same day.
+    for (const [wd, tpl] of Object.entries(WEEK_TEMPLATE)) {
+      for (const slot of ['am', 'pm']) {
+        const label = tpl[slot]?.label;
+        if (!label || tpl[slot]?.type === 'freestyle') continue; // Saturday offers Z2 as one choice
+        expect(label, `weekday ${wd} ${slot}`).not.toMatch(/Z2|Zone 2/);
+      }
+    }
+  });
+  it('Thursday is lift-only now that its second Z2 block is gone', () => {
+    expect(WEEK_TEMPLATE[4].am.lift).toBe('POSTERIOR');
+    expect(WEEK_TEMPLATE[4].pm).toBeNull();
+  });
   it('every template exercise has a valid rep range', () => {
     for (const lift of Object.values(LIFTS)) {
       for (const ex of lift.exercises) {

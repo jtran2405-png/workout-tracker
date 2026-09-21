@@ -45,7 +45,7 @@ describe('coach report', () => {
     expect(report).toContain('Protein target hit: 2/2 days · Junk: 1 · Ate late: 0');
   });
   it('lists training days with main-lift top sets and extras', () => {
-    expect(report).toContain('Mon 08-17: AM ✓ Lower · power lift (Back squat 60kg×8,8,8) · PM ✓ 25 min easy Z2 + mobility (evening ok)');
+    expect(report).toContain('Mon 08-17: AM ✓ Lower · power lift (Back squat 60kg×8,8,8) · PM ✓ Mobility + stretch (evening ok)');
     expect(report).toContain('+ Muay Thai 45min (light drills)');
     expect(report).toContain('Recovery: sauna ×1, plunge ×0');
   });
