@@ -9,14 +9,14 @@ function week1Doc() {
     weed: [{ time: '21:30', note: '' }], extras: [],
     food: { protein: true, junk: false, late: false, note: 'clean day' },
     recovery: { sauna: true, plunge: false },
-    amDone: true, pmDone: true, sparringNotes: null,
+    amDone: true, pmDone: true, runDone: false, sparringNotes: null,
   };
   doc.days['2026-08-18'] = {
     wake: '06:45', bedtime: '23:10', sleepHours: 6.5, bodyWeight: 79.0,
     weed: [], extras: [{ time: '17:00', type: 'Muay Thai', minutes: 45, note: 'light drills' }],
     food: { protein: true, junk: true, late: false, note: '' },
     recovery: { sauna: false, plunge: false },
-    amDone: true, pmDone: false, sparringNotes: null,
+    amDone: true, pmDone: false, runDone: false, sparringNotes: null,
   };
   doc.sessions['2026-08-17:AM'] = {
     date: '2026-08-17', slot: 'AM', template: 'LOWER', status: 'done',
@@ -32,7 +32,8 @@ describe('coach report', () => {
     expect(report).toContain('# Coach report — Week 1 (2026-08-17 → 2026-08-23)');
     expect(report).toContain('Phase: Ramp');
     expect(report).toContain('Streak: 2 days');
-    expect(report).toContain('Adherence: 3/3 slots (100%)');
+    // Mon's 3 slots (am, pm, daily run) elapsed with the run skipped, plus today's done AM
+    expect(report).toContain('Adherence: 3/4 slots (75%)');
   });
   it('grades the dailies', () => {
     expect(report).toContain('Dailies (weigh·sleep·protein·honest-log): 0/2 days 4-for-4');
@@ -48,6 +49,18 @@ describe('coach report', () => {
     expect(report).toContain('+ Muay Thai 45min (light drills)');
     expect(report).toContain('Recovery: sauna ×1, plunge ×0');
   });
+  it('shows the daily base run on every day line', () => {
+    // the run is a planned slot every day, so it must reconcile with the adherence count
+    expect(report).toContain('RUN ✗ 3–5k Z2 easy run'); // Mon: skipped
+  });
+  it('ticks the run line once the day records it', () => {
+    const doc = week1Doc();
+    doc.days['2026-08-17'].runDone = true;
+    const r = buildCoachReport(doc, 1, '2026-08-18');
+    expect(r).toContain('Mon 08-17:');
+    expect(r).toContain('RUN ✓ 3–5k Z2 easy run');
+    expect(r).toContain('Adherence: 4/4 slots (100%)');
+  });
   it('does not include future days', () => {
     expect(report).not.toContain('Wed 08-19');
   });
@@ -61,7 +74,7 @@ describe('coach report — wednesday recovery program', () => {
       weed: [], extras: [], food: { protein: false, junk: false, late: false, note: '' },
       recovery: { sauna: true, plunge: true },
       recoveryChecks: { bands: true, hips: true },
-      amDone: true, pmDone: false, sparringNotes: null,
+      amDone: true, pmDone: false, runDone: false, sparringNotes: null,
     };
     const r = buildCoachReport(doc, 1, '2026-08-19');
     expect(r).toContain('Recovery program (program 4/7)');

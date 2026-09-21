@@ -110,7 +110,7 @@ function backupNudge(doc) {
   const last = doc.flags.lastBackup;
   const stale = !last || (new Date(todayStr()) - new Date(last)) / 86400000 > 14;
   if (!stale) return h('p', { class: 'sub', style: 'margin-top:10px' }, `Last backup: ${last}`);
-  return h('div', { class: 'warn-note' }, '⚠︎',
+  return h('div', { class: 'warn-note' }, h('span', {}, '⚠︎'),
     last ? `Last backup ${last} — iOS can evict local data; back up every couple of weeks.`
          : 'No backup yet — iOS can evict local data from installed web apps. Download one now.');
 }

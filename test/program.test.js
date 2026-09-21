@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
   weekNumber, phaseFor, setsFor, repRange, suggestNextWeight,
-  canLift, plungeWarning, sparringMode, WEEK_TEMPLATE, LIFTS,
+  canLift, plungeWarning, sparringMode, WEEK_TEMPLATE, LIFTS, isLiftingDay,
   mondayOfWeek, addDays, runPace, slotsFor,
-  sleepHoursOf,
+  sleepHoursOf, DAILY_BASE, sleepFromClock,
 } from '../src/program.js';
 
 describe('week numbering (week 1 = Mon 2026-08-17)', () => {
@@ -123,6 +123,44 @@ describe('day rules', () => {
   });
 });
 
+describe('low-sleep readiness warning', () => {
+  // the Train view shows the "keep weights at last session's numbers" banner when
+  // sleep < 6h on a lifting day. Every lift is an AM slot, so a PM-only check is dead.
+  it('fires on every lifting day, all of which are AM', () => {
+    for (const date of ['2026-08-17', '2026-08-18', '2026-08-20', '2026-08-21']) {
+      expect(isLiftingDay(date), date).toBe(true);
+      expect(slotsFor(date).am.type).toBe('lift');
+      expect(slotsFor(date).pm?.type === 'lift').toBe(false); // never a PM lift
+    }
+  });
+  it('stays silent on the no-lift days', () => {
+    for (const date of ['2026-08-19', '2026-08-22', '2026-08-23']) {
+      expect(isLiftingDay(date), date).toBe(false);
+    }
+  });
+});
+
+describe('sleep from the clock pickers', () => {
+  it('computes hours across midnight', () => {
+    expect(sleepFromClock('22:30', '06:00')).toBe(7.5);
+    expect(sleepFromClock('23:10', '06:45')).toBe(7.6);
+  });
+  it('handles a same-day nap window without wrapping', () => {
+    expect(sleepFromClock('01:00', '08:30')).toBe(7.5);
+  });
+  it('is null unless both clock values parse', () => {
+    expect(sleepFromClock(null, '06:00')).toBeNull();
+    expect(sleepFromClock('22:30', null)).toBeNull();
+    expect(sleepFromClock('not-a-time', '06:00')).toBeNull();
+  });
+  it('an explicit sleepHours still wins over the pickers', () => {
+    expect(sleepHoursOf({ bedtime: '22:30', wake: '06:00', sleepHours: 5 })).toBe(5);
+  });
+  it('falls back to the pickers when sleepHours was never written', () => {
+    expect(sleepHoursOf({ bedtime: '22:30', wake: '06:00', sleepHours: null })).toBe(7.5);
+  });
+});
+
 describe('template shape', () => {
   it('four AM lift slots: three strength days plus Friday conditioning', () => {
     expect(WEEK_TEMPLATE[1].am.lift).toBe('LOWER');
@@ -134,6 +172,31 @@ describe('template shape', () => {
     expect(slotsFor('2026-08-28').am.lift).toBe('CONDITIONING');
     expect(WEEK_TEMPLATE[5].pm).toBeNull(); // hard conditioning day carries no PM slot
     expect(LIFTS.ATHLETIC.adhoc).toBe(true);
+  });
+  it('UPPER_B is retired from the weekly split but still reachable ad-hoc', () => {
+    // 04c41aa moved Friday to CONDITIONING; the session itself was kept as an option
+    const inSplit = Object.values(WEEK_TEMPLATE)
+      .flatMap((d) => [d.am, d.pm])
+      .some((slot) => slot?.lift === 'UPPER_B');
+    expect(inSplit).toBe(false);
+    expect(LIFTS.UPPER_B.adhoc).toBe(true);
+    // the Train view builds its off-plan picker from exactly this filter
+    expect(Object.keys(LIFTS).filter((k) => LIFTS[k].adhoc)).toContain('UPPER_B');
+  });
+  it('every lift is either in the weekly split, ad-hoc, or the baseline session', () => {
+    const inSplit = new Set(Object.values(WEEK_TEMPLATE)
+      .flatMap((d) => [d.am, d.pm])
+      .map((slot) => slot?.lift)
+      .filter(Boolean));
+    for (const [key, lift] of Object.entries(LIFTS)) {
+      const reachable = inSplit.has(key) || lift.adhoc === true || key === 'BASELINE';
+      expect(reachable, `${key} is unreachable from every screen`).toBe(true);
+    }
+  });
+  it('DAILY_BASE is a slot spec the Train view can render every day', () => {
+    expect(DAILY_BASE.type).toBe('cardio');
+    expect(DAILY_BASE.label).toMatch(/3–5k/); // 3–5k daily, not a fixed 5k
+    expect(DAILY_BASE.lift).toBeUndefined(); // cardio, never routed through liftBody
   });
   it('every template exercise has a valid rep range', () => {
     for (const lift of Object.values(LIFTS)) {

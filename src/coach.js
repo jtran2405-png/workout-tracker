@@ -3,7 +3,7 @@
 
 import {
   addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
-  slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb, RECOVERY_PROGRAM,
+  slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb, RECOVERY_PROGRAM, DAILY_BASE,
   sleepHoursOf,
 } from './program.js';
 import { currentStreak, weekAdherence, dailies } from './grit.js';
@@ -99,6 +99,8 @@ export function buildCoachReport(doc, week, today = todayStr()) {
       }
       parts.push(`${slot.toUpperCase()} ${isDone ? '✓' : '✗'} ${label}`);
     }
+    // the daily base run is planned every day, so it shows on every day's line
+    parts.push(`RUN ${d?.runDone ? '✓' : '✗'} ${DAILY_BASE.label}`);
     const xt = doc.sessions[`${date}:XT`];
     const xtTitle = xt ? LIFTS[xt.template].title : null;
     if (xt) {

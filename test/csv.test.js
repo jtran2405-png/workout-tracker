@@ -10,7 +10,7 @@ function sampleDoc() {
     extras: [{ time: '17:00', type: 'Muay Thai', minutes: 45, note: 'light drills' }],
     food: { protein: true, junk: false, late: true, note: 'pho for lunch' },
     recovery: { sauna: true, plunge: false },
-    amDone: true, pmDone: true, sparringNotes: null,
+    amDone: true, pmDone: true, runDone: true, sparringNotes: null,
   };
   doc.sessions['2026-08-18:PM'] = {
     date: '2026-08-18', slot: 'PM', template: 'UPPER_A', status: 'done',
@@ -49,9 +49,10 @@ describe('days.csv', () => {
     const lines = csv.trim().split('\n');
     expect(lines[0]).toContain('date,wake,bedtime,sleep_hours,body_weight,weed_count');
     expect(lines[0]).toContain('protein_hit,junk,ate_late,food_note');
-    expect(lines[0]).toContain('sparring_notes,extras');
+    expect(lines[0]).toContain('am_done,pm_done,run_done,sparring_notes,extras');
     expect(lines).toHaveLength(2);
-    expect(lines[1]).toBe('2026-08-18,06:30,22:45,7.5,78.4,1,21:10,1,0,1,pho for lunch,1,0,1,1,,17:00 Muay Thai 45min (light drills)');
+    // ...,sauna=1,plunge=0,am_done=1,pm_done=1,run_done=1,sparring_notes='',extras
+    expect(lines[1]).toBe('2026-08-18,06:30,22:45,7.5,78.4,1,21:10,1,0,1,pho for lunch,1,0,1,1,1,,17:00 Muay Thai 45min (light drills)');
   });
 });
 

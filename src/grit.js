@@ -1,10 +1,10 @@
 // Accountability mechanics — pure functions, unit tested.
 // No-zero-day: any completed slot or extra session keeps the chain alive.
 
-import { addDays, todayStr, slotsFor, mondayOfWeek, sleepHoursOf } from './program.js';
+import { addDays, todayStr, slotsFor, mondayOfWeek, sleepHoursOf, DAILY_BASE } from './program.js';
 
 export function isNonZeroDay(day, date = null, doc = null) {
-  if (!!day && (day.amDone || day.pmDone || (day.extras || []).length > 0)) return true;
+  if (!!day && (day.amDone || day.pmDone || day.runDone || (day.extras || []).length > 0)) return true;
   // an ad-hoc lift with at least one completed set counts, even if the
   // session was never fully finished
   if (date && doc) {
@@ -64,9 +64,14 @@ export function weekAdherence(doc, week, today = todayStr()) {
     if (doc.settings.startDate && date < doc.settings.startDate) continue; // before day one
     const tpl = slotsFor(date);
     const day = doc.days[date];
-    for (const slot of ['am', 'pm']) {
-      if (!tpl[slot]) continue;
-      const isDone = slot === 'am' ? !!day?.amDone : !!day?.pmDone;
+    // the daily 5k Z2 base run is planned every day, on top of the weekday template
+    const planForDay = [
+      [tpl.am, !!day?.amDone],
+      [tpl.pm, !!day?.pmDone],
+      [DAILY_BASE, !!day?.runDone],
+    ];
+    for (const [spec, isDone] of planForDay) {
+      if (!spec) continue;
       if (date < today) {
         planned++;
         if (isDone) done++;

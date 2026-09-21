@@ -1,7 +1,7 @@
 // HEALTH face — the habit ledger. No programming logic, just honest data:
 // sleep, weight, weed, food flags, recovery, showed-up status.
 
-import { todayStr, addDays, parseDate, DAY_NAMES, weekNumber, plungeWarning } from '../program.js';
+import { todayStr, addDays, parseDate, DAY_NAMES, weekNumber, plungeWarning, sleepFromClock } from '../program.js';
 import { getDay } from '../store.js';
 import { h, confirmDialog, nowTime, toast } from '../ui.js';
 import { isNonZeroDay, currentStreak, weekAdherence, dailies } from '../grit.js';
@@ -76,12 +76,21 @@ export function renderHealth(root, ctx) {
   ));
 
   // ---- sleep & weight ----
+  // Wake + bedtime auto-fill the Sleep h box; typing in that box still overrides,
+  // until the next time a picker changes.
+  const syncSleep = () => {
+    const derived = sleepFromClock(day.bedtime, day.wake);
+    if (derived != null) day.sleepHours = derived;
+    ctx.save();
+    ctx.refresh();
+  };
+
   root.append(h('div', { class: 'card' },
     h('h2', {}, 'Body & sleep'),
     h('div', { class: 'habits' },
-      habit('Wake', h('input', { type: 'time', value: day.wake || '', onchange: (e) => { day.wake = e.target.value || null; ctx.save(); } })),
-      habit('Bedtime', h('input', { type: 'time', value: day.bedtime || '', onchange: (e) => { day.bedtime = e.target.value || null; ctx.save(); } })),
-      habit('Sleep h', h('input', { type: 'number', inputmode: 'decimal', step: '0.5', min: '0', max: '14', placeholder: '7.5', value: day.sleepHours ?? '', onchange: (e) => { day.sleepHours = num(e.target.value); ctx.save(); } })),
+      habit('Wake', h('input', { type: 'time', value: day.wake || '', onchange: (e) => { day.wake = e.target.value || null; syncSleep(); } })),
+      habit('Bedtime', h('input', { type: 'time', value: day.bedtime || '', onchange: (e) => { day.bedtime = e.target.value || null; syncSleep(); } })),
+      habit('Sleep h', h('input', { type: 'number', inputmode: 'decimal', step: '0.5', min: '0', max: '14', placeholder: 'auto', value: day.sleepHours ?? '', onchange: (e) => { day.sleepHours = num(e.target.value); ctx.save(); ctx.refresh(); } })),
       habit('Weight kg', h('input', { type: 'number', inputmode: 'decimal', step: '0.1', min: '30', max: '200', placeholder: '—', value: day.bodyWeight ?? '', onchange: (e) => { day.bodyWeight = num(e.target.value); ctx.save(); } })),
     ),
   ));
@@ -149,7 +158,7 @@ export function renderHealth(root, ctx) {
     h('h2', {}, 'Recovery'),
     h('div', { class: 'recovery-chips' }, chip('sauna', '🔥 Sauna'), chip('plunge', '🧊 Cold plunge')),
     plungeWarning(date, day, doc) && !day.recovery.plunge
-      ? h('div', { class: 'warn-note' }, '⚠︎', 'You lifted today — skip the plunge (sauna is fine).')
+      ? h('div', { class: 'warn-note' }, h('span', {}, '⚠︎'), 'You lifted today — skip the plunge (sauna is fine).')
       : null,
   ));
 }

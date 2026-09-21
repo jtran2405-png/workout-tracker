@@ -31,17 +31,25 @@ export function fmtDate(d) {
 // The explicitly typed "Sleep h" number wins; otherwise derive it from the
 // Wake + Bedtime pickers, which is how the day is actually logged most days.
 // Bedtime → wake normally crosses midnight, so wrap into a 24 h window.
-export function sleepHoursOf(day) {
-  if (!day) return null;
-  if (day.sleepHours != null) return day.sleepHours;
-  if (!day.bedtime || !day.wake) return null;
+// Hours between a bedtime and a wake time, wrapping over midnight.
+// Returns null unless both clock values parse. Rounded to one decimal.
+export function sleepFromClock(bedtime, wake) {
+  if (!bedtime || !wake) return null;
   const mins = (t) => {
     const [hh, mm] = String(t).split(':').map(Number);
     return Number.isFinite(hh) && Number.isFinite(mm) ? hh * 60 + mm : null;
   };
-  const b = mins(day.bedtime), w = mins(day.wake);
+  const b = mins(bedtime), w = mins(wake);
   if (b == null || w == null) return null;
   return Math.round(((((w - b) % 1440) + 1440) % 1440) / 6) / 10;
+}
+
+// An explicitly logged sleepHours wins; otherwise derive it from the pickers
+// (days recorded before the Health view started writing the derived value).
+export function sleepHoursOf(day) {
+  if (!day) return null;
+  if (day.sleepHours != null) return day.sleepHours;
+  return sleepFromClock(day.bedtime, day.wake);
 }
 
 export function todayStr() {
@@ -164,6 +172,7 @@ export const LIFTS = {
   },
   UPPER_B: {
     title: 'Upper + arms (aesthetics)',
+    adhoc: true, // retired from the weekly split (Fri is conditioning); kept as an optional session
     exercises: [
       { name: 'Incline DB press', low: 6, high: 8, main: true },
       { name: 'Chin-up', low: 8, high: 10 },
@@ -256,13 +265,19 @@ export const WEEK_TEMPLATE = {
 };
 
 // Fighter-base-building program (Sep 2026 onward):
-// Daily: 5k Z2 easy run (conversational pace, builds aerobic base, lowers ACWR)
+// Daily: 3–5k Z2 easy run (conversational pace, builds aerobic base, lowers ACWR)
 // Reduced lifts (3/wk) with explosive primers → hard conditioning Fri → sparring Sat/Sun.
-// UPPER_B (aesthetics) retired in favor of conditioning-first architecture.
+// UPPER_B (aesthetics) retired from the weekly split in favor of conditioning-first
+// architecture; it stays available from the Train view's off-plan lift picker.
 // Sleep + weed discipline are load-bearing: minimum 7 hrs/night, no sessions after 6pm.
 
+// Runs every day on top of the weekday template, and counts toward weekly
+// adherence via its own `runDone` flag (see grit.weekAdherence). Shaped like a
+// WEEK_TEMPLATE slot spec so the Train view can render it through slotCard.
 export const DAILY_BASE = {
-  am: { type: 'cardio', label: '5k Z2 easy run (conversational pace, heart rate down)' },
+  type: 'cardio',
+  label: '3–5k Z2 easy run',
+  note: 'Conversational pace — heart rate down. HCMC heat rule: early morning outdoors, or evening Z2 indoors.',
 };
 
 export function slotsFor(dateStr) {

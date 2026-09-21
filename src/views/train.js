@@ -4,7 +4,7 @@
 import {
   todayStr, addDays, weekdayOf, weekNumber, phaseFor, PHASE_INFO, DAY_NAMES,
   slotsFor, LIFTS, setsFor, repRange, repTargetLabel, suggestNextWeight,
-  sparringMode, parseDate, runPace, RECOVERY_PROGRAM, sleepHoursOf,
+  sparringMode, parseDate, runPace, RECOVERY_PROGRAM, sleepHoursOf, DAILY_BASE, isLiftingDay,
 } from '../program.js';
 import { getDay, getSession, sessionKey, lastSetsFor } from '../store.js';
 import { h, toast, nowTime } from '../ui.js';
@@ -47,8 +47,10 @@ export function renderTrain(root, ctx) {
 
   // readiness: Train reads Health
   const slept = sleepHoursOf(day);
-  if (slept != null && slept < 6 && template.pm?.type === 'lift') {
-    root.append(h('div', { class: 'warn-note', style: 'margin: -4px 2px 12px' }, '⚠︎',
+  // every lift in the fighter-first split is an AM slot, so this must ask the day,
+  // not the PM slot — the old `template.pm?.type === 'lift'` check could never be true
+  if (slept != null && slept < 6 && isLiftingDay(date)) {
+    root.append(h('div', { class: 'warn-note', style: 'margin: -4px 2px 12px' }, h('span', {}, '⚠︎'),
       `${slept}h sleep — show up anyway, but keep weights at last session's numbers and cut the last set if form slips.`));
   }
 
@@ -62,6 +64,9 @@ export function renderTrain(root, ctx) {
       h('p', { class: 'sub' }, `Program starts Monday ${doc.settings.week1Monday.slice(8)}/${doc.settings.week1Monday.slice(5, 7)}. Rest, walk, mobility.`),
     ));
   }
+
+  // daily 5k Z2 base run — runs every day, independent of the weekday template
+  root.append(slotCard(ctx, date, day, 'RUN', DAILY_BASE, week, phase));
 
   root.append(adhocCard(ctx, date, day, phase));
   root.append(extrasCard(ctx, date, day));
@@ -82,8 +87,10 @@ export function renderTrain(root, ctx) {
 
 // ---------- slots ----------
 
+const DONE_KEY = { AM: 'amDone', PM: 'pmDone', RUN: 'runDone' };
+
 function slotCard(ctx, date, day, slot, spec, week, phase) {
-  const doneKey = slot === 'AM' ? 'amDone' : 'pmDone';
+  const doneKey = DONE_KEY[slot];
   const toggle = h('button', {
     class: `done-toggle${day[doneKey] ? ' on' : ''}`,
     onclick: () => {
@@ -115,11 +122,13 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
     ),
   );
 
+  if (spec.note) card.append(h('p', { class: 'sub', style: 'margin:-4px 2px 10px' }, spec.note));
+
   if (spec.type === 'lift') {
     // Recovery week guidance (Week 5+, back-pain protocol, or low-sleep days)
     const isRecoveryWeek = week === 5 && parseDate(date) <= parseDate('2026-09-20');
     if (isRecoveryWeek) {
-      card.append(h('div', { class: 'warn-note', style: 'margin: -4px 2px 12px' }, '🛑',
+      card.append(h('div', { class: 'warn-note', style: 'margin: -4px 2px 12px' }, h('span', {}, '🛑'),
         'RECOVERY WEEK: Use 50% load or form emphasis. Main lifts below — focus on mobility & control.'));
       card.append(h('div', { style: 'font-size: 13px; color: var(--ink-2); margin: -8px 2px 12px; line-height: 1.4' },
         h('strong', {}, 'Baseline loads (50% form work):'),

@@ -1,6 +1,6 @@
 import {
   todayStr, addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
-  slotsFor, LIFTS, repTargetLabel, sparringMode, parseDate, DAY_ABBR, weekdayOf,
+  slotsFor, LIFTS, repTargetLabel, sparringMode, parseDate, DAY_ABBR, weekdayOf, DAILY_BASE,
 } from '../program.js';
 import { h } from '../ui.js';
 
@@ -61,6 +61,7 @@ export function renderWeek(root, ctx) {
       h('div', { class: 'wd-slots' },
         slotLine('AM', tpl.am, day?.amDone),
         slotLine('PM', tpl.pm, day?.pmDone),
+        slotLine('RUN', DAILY_BASE, day?.runDone), // planned every day
         ...(day?.extras || []).map((x) => h('div', { class: 'wd-slot' },
           h('span', { class: 'tag' }, '＋'),
           h('span', { class: 'dot done' }),

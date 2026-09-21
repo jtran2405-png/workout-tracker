@@ -6,7 +6,7 @@ const day = (patch = {}) => ({
   wake: null, bedtime: null, sleepHours: null, bodyWeight: null,
   weed: [], extras: [], food: { protein: false, junk: false, late: false, note: '' },
   recovery: { sauna: false, plunge: false },
-  amDone: false, pmDone: false, sparringNotes: null, ...patch,
+  amDone: false, pmDone: false, runDone: false, sparringNotes: null, ...patch,
 });
 
 describe('no-zero-day', () => {
@@ -14,6 +14,7 @@ describe('no-zero-day', () => {
     expect(isNonZeroDay(day())).toBe(false);
     expect(isNonZeroDay(day({ amDone: true }))).toBe(true);
     expect(isNonZeroDay(day({ pmDone: true }))).toBe(true);
+    expect(isNonZeroDay(day({ runDone: true }))).toBe(true); // the daily 5k alone is not a zero day
     expect(isNonZeroDay(day({ extras: [{ type: 'Cardio', time: '07:00' }] }))).toBe(true);
     expect(isNonZeroDay(undefined)).toBe(false);
   });
@@ -71,19 +72,35 @@ describe('dailies (strict mode)', () => {
 });
 
 describe('week adherence', () => {
-  // week 1: Mon 2026-08-17 .. Sun 2026-08-23; Mon/Tue have 2 slots each
+  // week 1: Mon 2026-08-17 .. Sun 2026-08-23; Mon/Tue have 2 template slots each,
+  // plus the DAILY_BASE 5k Z2 run, which is planned every single day.
   it('counts elapsed planned slots only; today counts once done', () => {
     const doc = emptyDoc();
-    doc.days['2026-08-17'] = day({ amDone: true, pmDone: true }); // Mon: 2/2
-    doc.days['2026-08-18'] = day({ amDone: true });               // Tue (today): AM done, PM pending
+    doc.days['2026-08-17'] = day({ amDone: true, pmDone: true }); // Mon: 2/2 template, run skipped
+    doc.days['2026-08-18'] = day({ amDone: true });               // Tue (today): AM done, PM + run pending
     const adh = weekAdherence(doc, 1, '2026-08-18');
-    expect(adh).toEqual({ planned: 3, done: 3, pct: 100 });
+    // Mon elapsed → 3 planned (am, pm, run), 2 done; Tue is today → only the done AM counts
+    expect(adh).toEqual({ planned: 4, done: 3, pct: 75 });
+  });
+  it('the daily run counts toward adherence once ticked', () => {
+    const doc = emptyDoc();
+    doc.days['2026-08-17'] = day({ amDone: true, pmDone: true, runDone: true }); // Mon: 3/3
+    doc.days['2026-08-18'] = day({ runDone: true });                             // Tue (today): run only
+    const adh = weekAdherence(doc, 1, '2026-08-18');
+    // Mon 3/3 elapsed + today's completed run = 4/4
+    expect(adh).toEqual({ planned: 4, done: 4, pct: 100 });
+  });
+  it('a skipped daily run hurts the percentage like any other slot', () => {
+    const doc = emptyDoc();
+    doc.days['2026-08-17'] = day({ amDone: true, pmDone: true }); // Mon: run missed
+    const adh = weekAdherence(doc, 1, '2026-08-18');
+    expect(adh).toEqual({ planned: 3, done: 2, pct: 67 });
   });
   it('missed past slots hurt the percentage', () => {
     const doc = emptyDoc();
-    doc.days['2026-08-17'] = day({ amDone: true }); // Mon PM lift missed
+    doc.days['2026-08-17'] = day({ amDone: true }); // Mon PM lift and run both missed
     const adh = weekAdherence(doc, 1, '2026-08-18');
-    expect(adh).toEqual({ planned: 2, done: 1, pct: 50 });
+    expect(adh).toEqual({ planned: 3, done: 1, pct: 33 });
   });
   it('future week has nothing elapsed', () => {
     const adh = weekAdherence(emptyDoc(), 2, '2026-08-18');
@@ -91,8 +108,10 @@ describe('week adherence', () => {
     expect(adh.pct).toBeNull();
   });
   it('days before startDate never count (baseline week 0)', () => {
-    // week 0 = Aug 10–16, startDate Fri Aug 14 → only Fri+Sat slots elapsed by Sun 16
+    // week 0 = Aug 10–16, startDate Fri Aug 14 → only Fri+Sat slots elapsed by Sun 16.
+    // Fri = conditioning AM (1) + run (1); Sat = freestyle AM & recovery PM (2) + run (1) = 5.
+    // Sun's sparring slot and run are today, still pending, so they don't count yet.
     const adh = weekAdherence(emptyDoc(), 0, '2026-08-16');
-    expect(adh.planned).toBe(4);
+    expect(adh).toEqual({ planned: 5, done: 0, pct: 0 });
   });
 });

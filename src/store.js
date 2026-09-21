@@ -50,7 +50,7 @@ export function getDay(doc, date) {
       wake: null, bedtime: null, sleepHours: null, bodyWeight: null,
       weed: [], extras: [], food: { protein: false, junk: false, late: false, note: '' },
       recovery: { sauna: false, plunge: false },
-      amDone: false, pmDone: false, sparringNotes: null,
+      amDone: false, pmDone: false, runDone: false, sparringNotes: null,
     };
   }
   // backfill fields added after a day record was created
@@ -61,6 +61,7 @@ export function getDay(doc, date) {
   if (!d.recovery) d.recovery = { sauna: false, plunge: false };
   if (!d.recoveryChecks) d.recoveryChecks = {};
   if (d.attest === undefined) d.attest = false;
+  if (d.runDone === undefined) d.runDone = false; // daily 5k Z2 base run
   return d;
 }
 
