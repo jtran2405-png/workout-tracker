@@ -295,13 +295,14 @@ for (const lift of Object.values(LIFTS)) {
 // Weekly template keyed by weekday (0=Sun..6=Sat).
 // Fighter-first program: 3 lifts/wk (Mon/Tue/Thu) + hard conditioning (Fri) + sparring (Sat/Sun).
 // Lifts run in the AM (Justin's preference); PM slots carry mobility/skill work.
+// All three lift days carry one: Mon and Thu mobility, Tue light bag work.
 // Zone 2 is NOT duplicated here — it lives in DAILY_BASE, which runs every day.
 // HCMC heat rule: early morning for outdoor work; evening indoor Z2 ok.
 export const WEEK_TEMPLATE = {
   1: { am: { type: 'lift', lift: 'LOWER', after: 'sauna' },      pm: { type: 'cardio', label: 'Mobility + stretch (evening ok)' } },
   2: { am: { type: 'lift', lift: 'UPPER_A', after: 'sauna' },    pm: { type: 'cardio', label: 'Light bag work · 25 min' } },
   3: { am: { type: 'cardio', label: 'Incline walk 30 min · 10–12% · easy' }, pm: { type: 'recovery', label: 'Recovery program' } },
-  4: { am: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' },  pm: null }, // was a 2nd Z2 block; the daily run covers it
+  4: { am: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' },  pm: { type: 'cardio', label: 'Mobility + stretch (hips + hamstrings)' } },
   5: { am: { type: 'lift', lift: 'CONDITIONING' },                pm: null },
   6: { am: { type: 'freestyle', label: 'Freestyle — spar / lift / Zone 2' }, pm: { type: 'recovery', label: 'Cold plunge (skip if you lifted)' } },
   0: { am: null,                                                 pm: { type: 'sparring', label: 'Sparring' } },

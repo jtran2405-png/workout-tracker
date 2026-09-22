@@ -210,9 +210,19 @@ describe('template shape', () => {
       }
     }
   });
-  it('Thursday is lift-only now that its second Z2 block is gone', () => {
+  it('every lift day carries a PM slot, and none of them is a second Z2 block', () => {
+    // Stripping the duplicate Z2 left Thursday with no PM at all while Mon and
+    // Tue kept theirs; it now gets mobility aimed at what a deadlift day loads.
+    const liftDays = [1, 2, 4];
+    for (const wd of liftDays) {
+      expect(WEEK_TEMPLATE[wd].am.type, `weekday ${wd}`).toBe('lift');
+      expect(WEEK_TEMPLATE[wd].pm, `weekday ${wd} PM`).not.toBeNull();
+      expect(WEEK_TEMPLATE[wd].pm.label, `weekday ${wd} PM`).not.toMatch(/Z2|Zone 2/);
+    }
     expect(WEEK_TEMPLATE[4].am.lift).toBe('POSTERIOR');
-    expect(WEEK_TEMPLATE[4].pm).toBeNull();
+    expect(WEEK_TEMPLATE[4].pm.label).toMatch(/hips \+ hamstrings/);
+    // Friday's conditioning block stays AM-only — it is the hard day
+    expect(WEEK_TEMPLATE[5].pm).toBeNull();
   });
   it('every template exercise has a valid rep range', () => {
     for (const lift of Object.values(LIFTS)) {

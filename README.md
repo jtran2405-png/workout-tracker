@@ -5,7 +5,7 @@ Mobile-first PWA for daily training + lifestyle tracking. Dark, minimal, one-han
 Built around a specific program — fighter-first, aerobic base before volume:
 
 - **Every day:** 3–5k Zone 2 easy run (its own `RUN` slot, counts toward adherence).
-- **Mon / Tue / Thu:** AM lift (Lower · power, Upper push/pull, Posterior · power), sauna after. Mon + Tue carry a PM slot (mobility, light bag work).
+- **Mon / Tue / Thu:** AM lift (Lower · power, Upper push/pull, Posterior · power), sauna after. Each carries a PM slot — mobility Mon/Thu, light bag work Tue.
 - **Wed:** hard no-lift day — incline walk AM, recovery checklist PM.
 - **Fri:** hard conditioning block, AM only.
 - **Sat / Sun:** freestyle + cold plunge, then Muay Thai sparring — technical weeks 1–4, live from week 5.
