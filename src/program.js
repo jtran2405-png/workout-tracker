@@ -147,7 +147,7 @@ export const LIFTS = {
   },
   ATHLETIC: {
     title: 'Athletic upper (power)',
-    adhoc: true, // Saturday-freestyle material; anchors conditioning day from week 5
+    adhoc: true, // Saturday-freestyle material; CONDITIONING owns Friday
     exercises: [
       { name: 'Med-ball chest pass', low: 5, high: 5, sets: 3, note: 'explosive intent, full rest' },
       { name: 'Landmine punch press', low: 6, high: 6, main: true, note: 'per side, fight stance' },

@@ -2,12 +2,21 @@
 
 Mobile-first PWA for daily training + lifestyle tracking. Dark, minimal, one-handed at the gym. No accounts, no backend — everything lives in the phone's localStorage.
 
-Built around a specific program: 3 lifting days + posterior chain, AM Zone 2 cardio, Wed hard recovery, weekend Muay Thai sparring. Ramp phase weeks 1–4 (3 sets, RIR 3–4) → Build phase week 5+ (4 sets, main lifts 4–6 reps, Sunday sparring goes live). Week 1 = Mon 2026-08-17.
+Built around a specific program — fighter-first, aerobic base before volume:
+
+- **Every day:** 3–5k Zone 2 easy run (its own `RUN` slot, counts toward adherence).
+- **Mon / Tue / Thu:** AM lift (Lower · power, Upper push/pull, Posterior · power), sauna after. Mon + Tue carry a PM slot (mobility, light bag work).
+- **Wed:** hard no-lift day — incline walk AM, recovery checklist PM.
+- **Fri:** hard conditioning block, AM only.
+- **Sat / Sun:** freestyle + cold plunge, then Muay Thai sparring — technical weeks 1–4, live from week 5.
+
+Ramp phase weeks 1–4 (3 sets, RIR 3–4) → Build phase week 5+ (4 sets, main lifts 4–6 reps). Week 1 = Mon 2026-08-17. The split lives in `WEEK_TEMPLATE` / `DAILY_BASE` in `src/program.js`; adherence is recomputed from the template rather than stored, so editing it re-scores past weeks.
 
 ## Tabs
 
-- **Today** — wake / bedtime / sleep / body weight / weed log, AM + PM slots with set-by-set lift logging (tap ✓ with empty fields to auto-fill the suggested weight × target reps), sauna/plunge check-offs (with the plunge-on-lifting-day warning), sparring notes.
-- **Week** — 7-day status grid + the full suggested split, phase-adjusted.
+- **Health** — the habit ledger: wake / bedtime / sleep / body weight / weed log, food flags, the four non-negotiable dailies, sauna/plunge check-offs (with the plunge-on-lifting-day warning). Wake + bedtime auto-fill sleep hours; typing in the box overrides until the next picker change.
+- **Train** — the day's plan: AM + PM slots plus the daily RUN, set-by-set lift logging (tap ✓ with empty fields to auto-fill the suggested weight × target reps), an off-plan lift picker, extras, sparring notes. Strict mode: a lift's ✓ is only accepted once every planned set is logged.
+- **Week** (`#/train/week`) — 7-day status grid + the full suggested split, phase-adjusted.
 - **Progress** — stat tiles, per-exercise weight charts with the +2.5 kg suggestion (bump only when all planned sets hit the top of the rep range), body-weight and sleep trends.
 - **Data** — program settings, CSV exports (`sets.csv`, `days.csv`), full JSON backup/restore, baseline editor.
 

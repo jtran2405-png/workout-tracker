@@ -74,6 +74,10 @@ export function renderWeek(root, ctx) {
 
   // ---- the split reference (suggested training, phase-adjusted) ----
   const split = h('div', { class: 'card' }, h('h2', {}, 'The split — suggested training'));
+  // the daily run is not in WEEK_TEMPLATE, so name it once up top or the split
+  // reads as if aerobic work were missing from the program entirely
+  split.append(h('p', { class: 'sub', style: 'margin:-4px 2px 10px' },
+    `Every day: ${DAILY_BASE.label}. On top of that:`));
   const dayOrder = [1, 2, 3, 4, 5, 6, 0];
   for (const wd of dayOrder) {
     const tpl = { ...slotsFor(addDays(monday, dayOrder.indexOf(wd))) };
@@ -97,10 +101,12 @@ export function renderWeek(root, ctx) {
     } else {
       const am = tpl.am ? `AM ${tpl.am.label}` : null;
       const pm = tpl.pm ? `PM ${tpl.pm.label}` : null;
-      split.append(h('div', { class: 'ex-line', style: 'border-top:1px solid var(--line);padding:12px 2px' },
-        h('span', { style: 'font-weight:700;color:var(--ink-2)' }, name),
-        h('span', { class: 't' }, [am, pm].filter(Boolean).join(' · ')),
-      ));
+      // Same one-line grammar as the lift rows above ("Mon — AM … · PM …").
+      // The old two-span layout reused `.ex-line`, which is only styled inside
+      // `details.split`, so these rows rendered unstyled and the day name ran
+      // straight into the slot text ("WedAM Incline walk 30 min…").
+      split.append(h('div', { class: 'split-line' },
+        `${name} — ${[am, pm].filter(Boolean).join(' · ')}`));
     }
   }
   split.append(h('p', { class: 'sub', style: 'margin-top:10px' },

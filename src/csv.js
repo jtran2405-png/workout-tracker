@@ -1,5 +1,7 @@
 // CSV + JSON export. Pure functions over the store document — unit tested.
 
+import { sleepHoursOf } from './program.js';
+
 function esc(v) {
   if (v == null) return '';
   const s = String(v);
@@ -35,7 +37,9 @@ export function daysCsv(doc) {
     const d = doc.days[date];
     const weed = d.weed || [];
     lines.push(row([
-      date, d.wake ?? '', d.bedtime ?? '', d.sleepHours ?? '', d.bodyWeight ?? '',
+      // sleepHoursOf, not d.sleepHours: days logged with only the Wake/Bedtime
+      // pickers have no stored number, and every other consumer derives it
+      date, d.wake ?? '', d.bedtime ?? '', sleepHoursOf(d) ?? '', d.bodyWeight ?? '',
       weed.length, weed.map((w) => w.time).join(' '),
       d.food?.protein ? 1 : 0, d.food?.junk ? 1 : 0, d.food?.late ? 1 : 0, d.food?.note ?? '',
       d.recovery?.sauna ? 1 : 0, d.recovery?.plunge ? 1 : 0,

@@ -54,6 +54,21 @@ describe('days.csv', () => {
     // ...,sauna=1,plunge=0,am_done=1,pm_done=1,run_done=1,sparring_notes='',extras
     expect(lines[1]).toBe('2026-08-18,06:30,22:45,7.5,78.4,1,21:10,1,0,1,pho for lunch,1,0,1,1,1,,17:00 Muay Thai 45min (light drills)');
   });
+  it('derives sleep_hours from the pickers when no number was typed', () => {
+    // days logged before the Health view wrote the derived value have only
+    // wake + bedtime; the app shows 7.5h for them, so the export must too
+    const doc = sampleDoc();
+    doc.days['2026-08-18'].sleepHours = null;
+    const cells = daysCsv(doc).trim().split('\n')[1].split(',');
+    expect(cells[3]).toBe('7.8'); // 22:45 → 06:30 wraps midnight = 7.75h, rounded to 1dp
+    expect(cells[1]).toBe('06:30'); // the raw pickers still export untouched
+    expect(cells[2]).toBe('22:45');
+  });
+  it('leaves sleep_hours empty when neither the number nor both pickers exist', () => {
+    const doc = sampleDoc();
+    Object.assign(doc.days['2026-08-18'], { sleepHours: null, bedtime: null });
+    expect(daysCsv(doc).trim().split('\n')[1].split(',')[3]).toBe('');
+  });
 });
 
 describe('backup roundtrip', () => {
