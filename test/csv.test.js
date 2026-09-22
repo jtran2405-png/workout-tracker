@@ -30,10 +30,13 @@ describe('sets.csv', () => {
   it('one row per set with header', () => {
     const csv = setsCsv(sampleDoc());
     const lines = csv.trim().split('\n');
-    expect(lines[0]).toBe('date,slot,workout,exercise,set,weight,reps,done');
+    expect(lines[0]).toBe('date,slot,workout,exercise,set,weight,bar_kg,total_kg,reps,done');
     expect(lines).toHaveLength(1 + 3 + 1);
-    expect(lines[1]).toBe('2026-08-18,PM,UPPER_A,Bench press,1,40,8,1');
-    expect(lines[3]).toBe('2026-08-18,PM,UPPER_A,Bench press,3,40,7,1');
+    // 40 kg loaded onto a 20 kg bar = 60 kg pressed; the raw entry stays visible
+    expect(lines[1]).toBe('2026-08-18,PM,UPPER_A,Bench press,1,40,20,60,8,1');
+    expect(lines[3]).toBe('2026-08-18,PM,UPPER_A,Bench press,3,40,20,60,7,1');
+    // the lat pulldown is a stack — nothing to add
+    expect(lines[4]).toBe('2026-08-18,PM,UPPER_A,Lat pulldown,1,50,0,50,10,1');
   });
   it('escapes commas and quotes', () => {
     const doc = sampleDoc();

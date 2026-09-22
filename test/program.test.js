@@ -4,6 +4,7 @@ import {
   canLift, plungeWarning, sparringMode, WEEK_TEMPLATE, LIFTS, isLiftingDay,
   mondayOfWeek, addDays, runPace, slotsFor,
   sleepHoursOf, DAILY_BASE, sleepFromClock,
+  barKg, totalKg, BAR_BY_EXERCISE, DEFAULT_BARS, DEFAULT_SETTINGS,
 } from '../src/program.js';
 
 describe('week numbering (week 1 = Mon 2026-08-17)', () => {
@@ -250,5 +251,57 @@ describe('sleepHoursOf', () => {
     expect(sleepHoursOf(null)).toBe(null);
     expect(sleepHoursOf({ bedtime: '23:00' })).toBe(null);
     expect(sleepHoursOf({ wake: '07:00' })).toBe(null);
+  });
+});
+
+describe('bar weights', () => {
+  it('adds the bar to plates for barbell lifts', () => {
+    // the whole point: Justin types what he loads, never a running total
+    expect(totalKg(45, 'Bench press')).toBe(65);
+    expect(totalKg(60, 'Back squat')).toBe(80);
+    expect(totalKg(20, 'EZ-bar curl')).toBe(27.5);
+  });
+  it('adds nothing where there is no bar to add', () => {
+    // a landmine is anchored at one end, so "plates + 20" is simply false;
+    // cables, machines, dumbbells and kettlebells have no bar at all
+    for (const name of ['Landmine punch press', 'Landmine rotation', 'Lat pulldown',
+      'Seated cable row', 'Incline DB press', 'KB swings, heavy', 'Goblet squat',
+      'Chin-up', 'Flat DB bench press']) {
+      expect(barKg(name), name).toBe(0);
+      expect(totalKg(30, name), name).toBe(30);
+    }
+  });
+  it('every tagged exercise resolves to a real bar weight', () => {
+    for (const [name, key] of Object.entries(BAR_BY_EXERCISE)) {
+      expect(DEFAULT_BARS[key], `${name} -> ${key}`).toBeGreaterThan(0);
+      expect(barKg(name)).toBe(DEFAULT_BARS[key]);
+    }
+    expect(Object.keys(BAR_BY_EXERCISE).length).toBeGreaterThan(0);
+  });
+  it('the tag lives on the template, so the lookup cannot drift', () => {
+    for (const lift of Object.values(LIFTS)) {
+      for (const ex of lift.exercises) {
+        if (ex.bar) expect(BAR_BY_EXERCISE[ex.name], ex.name).toBe(ex.bar);
+      }
+    }
+  });
+  it('a gym with a different bar is a settings change, not a code change', () => {
+    const womens = { bars: { olympic: 15, ez: 7.5 } };
+    expect(totalKg(45, 'Bench press', womens)).toBe(60);
+    // a settings object missing `bars` entirely still works (older backups)
+    expect(totalKg(45, 'Bench press', {})).toBe(65);
+  });
+  it('null and unparseable weights stay null', () => {
+    expect(totalKg(null, 'Bench press')).toBe(null);
+    expect(totalKg('', 'Bench press')).toBe(null);
+    expect(totalKg('heavy', 'Bench press')).toBe(null);
+  });
+  it('default settings ship the bar weights so migrate() backfills them', () => {
+    expect(DEFAULT_SETTINGS.bars).toEqual(DEFAULT_BARS);
+  });
+  it('warmups and bodyweight work are never tagged', () => {
+    for (const name of Object.keys(BAR_BY_EXERCISE)) {
+      expect(name.startsWith('WARMUP:'), name).toBe(false);
+    }
   });
 });

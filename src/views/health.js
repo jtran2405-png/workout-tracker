@@ -87,9 +87,15 @@ export function renderHealth(root, ctx) {
 
   root.append(h('div', { class: 'card' },
     h('h2', {}, 'Body & sleep'),
+    // A day record holds the night that ENDED on that date: you fell asleep the
+    // evening before and woke on the morning of this date. That is the only
+    // reading that makes the Train tab's readiness check correct — it gates the
+    // morning lift on the night that preceded it.
+    h('p', { class: 'sub', style: 'margin:-4px 2px 10px' },
+      'The night that ended this morning — log it on the day you wake up, not the night before. This is the sleep the Train tab checks before a lift.'),
     h('div', { class: 'habits' },
-      habit('Wake', h('input', { type: 'time', value: day.wake || '', onchange: (e) => { day.wake = e.target.value || null; syncSleep(); } })),
-      habit('Bedtime', h('input', { type: 'time', value: day.bedtime || '', onchange: (e) => { day.bedtime = e.target.value || null; syncSleep(); } })),
+      habit('Fell asleep', h('input', { type: 'time', value: day.bedtime || '', onchange: (e) => { day.bedtime = e.target.value || null; syncSleep(); } })),
+      habit('Woke up', h('input', { type: 'time', value: day.wake || '', onchange: (e) => { day.wake = e.target.value || null; syncSleep(); } })),
       habit('Sleep h', h('input', { type: 'number', inputmode: 'decimal', step: '0.5', min: '0', max: '14', placeholder: 'auto', value: day.sleepHours ?? '', onchange: (e) => { day.sleepHours = num(e.target.value); ctx.save(); ctx.refresh(); } })),
       habit('Weight kg', h('input', { type: 'number', inputmode: 'decimal', step: '0.1', min: '30', max: '200', placeholder: '—', value: day.bodyWeight ?? '', onchange: (e) => { day.bodyWeight = num(e.target.value); ctx.save(); } })),
     ),

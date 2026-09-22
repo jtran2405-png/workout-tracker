@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { emptyDoc, getDay } from '../src/store.js';
+import { emptyDoc, getDay, migrate } from '../src/store.js';
+import { totalKg } from '../src/program.js';
 
 describe('day record shape', () => {
   it('new days start with every done-flag false', () => {
@@ -22,5 +23,21 @@ describe('day record shape', () => {
     const d = getDay(doc, '2026-08-17');
     expect(d.runDone).toBe(false);
     expect(d.amDone).toBe(true); // backfill must not clobber existing data
+  });
+});
+
+describe('settings migration', () => {
+  it('backfills bar weights into a document saved before they existed', () => {
+    // Justin's phone holds a doc whose settings predate the `bars` key; the
+    // shallow settings merge has to supply it or barKg falls back silently
+    const old = { version: 1, settings: { startDate: '2026-08-14', week1Monday: '2026-08-17', walkAround: 58 }, days: {}, sessions: {}, flags: {} };
+    const doc = migrate(old);
+    expect(doc.settings.bars).toEqual({ olympic: 20, ez: 7.5 });
+    expect(doc.settings.walkAround).toBe(58); // his own values survive
+    expect(totalKg(45, 'Bench press', doc.settings)).toBe(65);
+  });
+  it('keeps a bar weight the user has already customised', () => {
+    const doc = migrate({ settings: { bars: { olympic: 15, ez: 7.5 } } });
+    expect(totalKg(45, 'Bench press', doc.settings)).toBe(60);
   });
 });

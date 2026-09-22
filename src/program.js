@@ -7,7 +7,41 @@ export const DEFAULT_SETTINGS = {
   unit: 'kg',
   walkAround: 58,            // lean walk-around target ≈128 lb (realistic range 127–130)
   goalWeight: 55.5,          // fight weight ≈122 lb (range 121–123); water cut covers lower when needed
+  bars: { olympic: 20, ez: 7.5 }, // bar weights, editable — gyms vary
 };
+
+// ---------- bar weights ----------
+
+// Justin logs what he LOADS: the plates he puts on the bar, nothing else. No
+// mental arithmetic mid-session. The app adds the bar wherever one is involved,
+// so anything read back out — coach report, CSV, the total under each lift —
+// is the real weight moved.
+//
+// Storing plates (not totals) also keeps every set logged before this existed
+// valid: those entries were already plates-only, so no history needs rewriting.
+export const DEFAULT_BARS = { olympic: 20, ez: 7.5 };
+
+// Exercise name → bar key, built from the templates so the two can't drift.
+// Only implements where "bar + plates" is the honest description are tagged:
+// a landmine is anchored at one end (you carry a fraction of the bar, varying
+// with the angle), and cables, machines, dumbbells and kettlebells have no bar
+// at all. Tagging those would invent load that was never lifted.
+export const BAR_BY_EXERCISE = {};
+
+export function barKg(exerciseName, settings = DEFAULT_SETTINGS) {
+  const key = BAR_BY_EXERCISE[exerciseName];
+  if (!key) return 0;
+  const bars = settings?.bars || DEFAULT_BARS;
+  return bars[key] ?? DEFAULT_BARS[key] ?? 0;
+}
+
+// Plates logged → weight actually moved. null in, null out.
+export function totalKg(plates, exerciseName, settings = DEFAULT_SETTINGS) {
+  if (plates == null || plates === '') return null;
+  const n = Number(plates);
+  if (!Number.isFinite(n)) return null;
+  return Math.round((n + barKg(exerciseName, settings)) * 10) / 10;
+}
 
 export function kgLb(kg) {
   return `${kg} kg / ${Math.round(kg * 2.2046)} lb`;
@@ -111,8 +145,8 @@ export const LIFTS = {
       { name: 'WARMUP: Leg swings & hip circles', low: 1, high: 1, sets: 1, note: '10 each direction per leg' },
       { name: 'WARMUP: Air squats', low: 10, high: 10, sets: 1, note: 'bodyweight, full range' },
       { name: 'Box jump', low: 3, high: 3, sets: 3, note: 'low box, stick the landing, full rest' },
-      { name: 'Back squat', low: 6, high: 8, main: true },
-      { name: 'Romanian deadlift', low: 8, high: 8 },
+      { name: 'Back squat', low: 6, high: 8, main: true, bar: 'olympic' },
+      { name: 'Romanian deadlift', low: 8, high: 8, bar: 'olympic' },
       { name: 'Bulgarian split squat', low: 8, high: 8, note: 'per leg — balance under load' },
       { name: 'Standing calf raise', low: 12, high: 12, sets: 4 },
       { name: 'Landmine rotation', low: 10, high: 10, note: 'per side, controlled' },
@@ -125,7 +159,7 @@ export const LIFTS = {
       { name: 'WARMUP: Arm circles & band pull-aparts', low: 1, high: 1, sets: 1, note: '15 pull-aparts each direction' },
       { name: 'WARMUP: Light rows', low: 8, high: 8, sets: 1, note: 'half load, groove the pattern' },
       { name: 'Med-ball chest pass', low: 5, high: 5, sets: 3, note: 'explosive intent, full rest' },
-      { name: 'Bench press', low: 6, high: 8, main: true, note: 'flat DB bench if no machine/bar free' },
+      { name: 'Bench press', low: 6, high: 8, main: true, note: 'flat DB bench if no machine/bar free', bar: 'olympic' },
       { name: 'Lat pulldown', low: 8, high: 10, note: 'or assisted pull-up' },
       { name: 'Seated cable row', low: 10, high: 10 },
       { name: 'Landmine punch press', low: 6, high: 6, note: 'per side, fight stance' },
@@ -139,8 +173,8 @@ export const LIFTS = {
       { name: 'WARMUP: Cat-cow stretch', low: 1, high: 1, sets: 1, note: '10 reps, mobilize spine' },
       { name: 'WARMUP: Light hip thrusts', low: 10, high: 10, sets: 1, note: 'bodyweight or light, groove hips' },
       { name: 'Med-ball rotational slam', low: 5, high: 5, sets: 3, note: 'per side — throw violently, full rest' },
-      { name: 'Deadlift', low: 5, high: 5, main: true, note: 'trap bar or conventional' },
-      { name: 'Hip thrust', low: 10, high: 10 },
+      { name: 'Deadlift', low: 5, high: 5, main: true, note: 'trap bar or conventional', bar: 'olympic' },
+      { name: 'Hip thrust', low: 10, high: 10, bar: 'olympic' },
       { name: 'Chest-supported row', low: 12, high: 12 },
       { name: "Farmer's carry", low: 3, high: 3, unitLabel: 'trips' },
     ],
@@ -179,7 +213,7 @@ export const LIFTS = {
       { name: 'Single-arm DB row', low: 10, high: 10 },
       { name: 'DB shoulder press', low: 10, high: 10 },
       { name: 'Cable lateral raise', low: 15, high: 15 },
-      { name: 'EZ-bar curl', low: 12, high: 12 },
+      { name: 'EZ-bar curl', low: 12, high: 12, bar: 'ez' },
       { name: 'Rope triceps pushdown', low: 12, high: 12 },
     ],
   },
@@ -187,7 +221,7 @@ export const LIFTS = {
     title: 'Chest day',
     adhoc: true, // startable from any day's Train view, not part of the weekly split
     exercises: [
-      { name: 'Flat bench press', low: 6, high: 8, main: true, note: 'barbell or DB' },
+      { name: 'Flat bench press', low: 6, high: 8, main: true, note: 'barbell or DB', bar: 'olympic' },
       { name: 'Incline DB press', low: 8, high: 10 },
       { name: 'Cable fly', low: 12, high: 15, note: 'or pec deck' },
       { name: 'Rope triceps pushdown', low: 10, high: 12 },
@@ -220,7 +254,7 @@ export const LIFTS = {
     title: 'Arm day',
     adhoc: true,
     exercises: [
-      { name: 'EZ-bar curl', low: 8, high: 12, main: true },
+      { name: 'EZ-bar curl', low: 8, high: 12, main: true, bar: 'ez' },
       { name: 'Rope triceps pushdown', low: 10, high: 12 },
       { name: 'Incline DB curl', low: 10, high: 12 },
       { name: 'Overhead rope extension', low: 10, high: 12 },
@@ -232,7 +266,7 @@ export const LIFTS = {
     adhoc: true,
     exercises: [
       { name: 'Goblet squat', low: 10, high: 12 },
-      { name: 'Flat bench press', low: 8, high: 10, note: 'barbell or DB' },
+      { name: 'Flat bench press', low: 8, high: 10, note: 'barbell or DB', bar: 'olympic' },
       { name: 'Lat pulldown', low: 8, high: 10 },
       { name: 'DB shoulder press', low: 8, high: 10 },
       { name: "Farmer's carry", low: 1, high: 1, note: 'log trips as reps, weight per hand' },
@@ -249,6 +283,12 @@ export const LIFTS = {
     ],
   },
 };
+
+// Populated from LIFTS above, so tagging an exercise is the only step needed —
+// the lookup can never drift from the templates.
+for (const lift of Object.values(LIFTS)) {
+  for (const ex of lift.exercises) if (ex.bar) BAR_BY_EXERCISE[ex.name] = ex.bar;
+}
 
 // Weekly template keyed by weekday (0=Sun..6=Sat).
 // Fighter-first program: 3 lifts/wk (Mon/Tue/Thu) + hard conditioning (Fri) + sparring (Sat/Sun).

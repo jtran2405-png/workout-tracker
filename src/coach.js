@@ -4,16 +4,18 @@
 import {
   addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
   slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb, RECOVERY_PROGRAM, DAILY_BASE,
-  sleepHoursOf,
+  sleepHoursOf, totalKg,
 } from './program.js';
 import { currentStreak, weekAdherence, dailies } from './grit.js';
 
-function topSet(sets) {
+// Logged weights are plates only, so report the bar too — a coach reading
+// "Bench press 45kg" when 65 kg was actually pressed gives the wrong advice.
+function topSet(sets, exName, settings) {
   const done = (sets || []).filter((s) => s.done && s.weight != null);
   if (!done.length) return null;
   const w = Math.max(...done.map((s) => Number(s.weight)));
   const reps = done.filter((s) => Number(s.weight) === w).map((s) => s.reps).join(',');
-  return `${w}kg×${reps}`;
+  return `${totalKg(w, exName, settings)}kg×${reps}`;
 }
 
 export function buildCoachReport(doc, week, today = todayStr()) {
@@ -92,7 +94,7 @@ export function buildCoachReport(doc, week, today = todayStr()) {
       if (spec.type === 'lift') {
         const sess = doc.sessions[`${date}:${slot.toUpperCase()}`];
         const mains = LIFTS[spec.lift].exercises.filter((e) => e.main).map((e) => {
-          const t = topSet(sess?.exercises?.[e.name]);
+          const t = topSet(sess?.exercises?.[e.name], e.name, doc.settings);
           return t ? `${e.name} ${t}` : null;
         }).filter(Boolean);
         if (mains.length) label += ` (${mains.join(', ')})`;
@@ -105,7 +107,7 @@ export function buildCoachReport(doc, week, today = todayStr()) {
     const xtTitle = xt ? LIFTS[xt.template].title : null;
     if (xt) {
       const mains = LIFTS[xt.template].exercises.filter((e) => e.main).map((e) => {
-        const t = topSet(xt.exercises?.[e.name]);
+        const t = topSet(xt.exercises?.[e.name], e.name, doc.settings);
         return t ? `${e.name} ${t}` : null;
       }).filter(Boolean);
       parts.push(`+ ${xtTitle} (ad-hoc${mains.length ? `: ${mains.join(', ')}` : ''})`);

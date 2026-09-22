@@ -12,9 +12,11 @@ Built around a specific program — fighter-first, aerobic base before volume:
 
 Ramp phase weeks 1–4 (3 sets, RIR 3–4) → Build phase week 5+ (4 sets, main lifts 4–6 reps). Week 1 = Mon 2026-08-17. The split lives in `WEEK_TEMPLATE` / `DAILY_BASE` in `src/program.js`; adherence is recomputed from the template rather than stored, so editing it re-scores past weeks.
 
+**Logged lift weights are plates only.** The bar is added by the app (`totalKg` in `src/program.js`), so there is no arithmetic to do mid-set — enter what you put on the bar. Bar weights are set in Data → Bar weights (straight 20 kg, EZ 7.5 kg by default) since gyms vary. Landmine, cable, machine, dumbbell and kettlebell work gets nothing added; a landmine is anchored at one end, so "plates + bar" would be a fiction. Everything downstream — coach report, `sets.csv`'s `total_kg`, the progression chart — reports the real weight moved.
+
 ## Tabs
 
-- **Health** — the habit ledger: wake / bedtime / sleep / body weight / weed log, food flags, the four non-negotiable dailies, sauna/plunge check-offs (with the plunge-on-lifting-day warning). Wake + bedtime auto-fill sleep hours; typing in the box overrides until the next picker change.
+- **Health** — the habit ledger: sleep / body weight / weed log, food flags, the four non-negotiable dailies, sauna/plunge check-offs (with the plunge-on-lifting-day warning). Fell-asleep + woke-up auto-fill sleep hours; typing in the box overrides until the next picker change. A day record holds **the night that ended on that date** — log it on the morning you wake up, since the Train tab gates that day's lift on it.
 - **Train** — the day's plan: AM + PM slots plus the daily RUN, set-by-set lift logging (tap ✓ with empty fields to auto-fill the suggested weight × target reps), an off-plan lift picker, extras, sparring notes. Strict mode: a lift's ✓ is only accepted once every planned set is logged.
 - **Week** (`#/train/week`) — 7-day status grid + the full suggested split, phase-adjusted.
 - **Progress** — stat tiles, per-exercise weight charts with the +2.5 kg suggestion (bump only when all planned sets hit the top of the rep range), body-weight and sleep trends.

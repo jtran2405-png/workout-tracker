@@ -5,6 +5,7 @@ import {
   todayStr, addDays, weekdayOf, weekNumber, phaseFor, PHASE_INFO, DAY_NAMES,
   slotsFor, LIFTS, setsFor, repRange, repTargetLabel, suggestNextWeight,
   sparringMode, parseDate, runPace, RECOVERY_PROGRAM, sleepHoursOf, DAILY_BASE, isLiftingDay,
+  barKg,
 } from '../program.js';
 import { getDay, getSession, sessionKey, lastSetsFor } from '../store.js';
 import { h, toast, nowTime } from '../ui.js';
@@ -255,16 +256,32 @@ function liftBody(ctx, date, day, liftKey, phase, slot = 'PM') {
     const suggest = suggestNextWeight(prev, planned, high);
     const sets = existing?.exercises?.[ex.name] || [];
 
+    // Weight fields take PLATES. The bar is added by the app so there is no
+    // arithmetic to do mid-set; `barLine` echoes the total back as confirmation.
+    const bar = barKg(ex.name, doc.settings);
+    const barLine = bar ? h('div', { class: 'ex-bar' }) : null;
+
     const exEl = h('div', { class: 'exercise' },
       h('div', { class: 'ex-head' },
         h('span', { class: 'ex-name' }, ex.name),
         h('span', { class: 'ex-target' },
           repTargetLabel(ex, phase),
-          suggest != null ? h('span', { class: 'ex-suggest' }, `  → ${fmtW(suggest)} kg`) : null,
+          suggest != null ? h('span', { class: 'ex-suggest' },
+            `  → ${fmtW(suggest)} kg${bar ? ` (${fmtW(suggest + bar)} total)` : ''}`) : null,
         ),
         ex.note ? h('span', { class: 'ex-note' }, ex.note) : null,
       ),
     );
+
+    const wInputs = [];
+    // heaviest plate load entered so far → what that actually weighs with the bar
+    const paintBar = () => {
+      if (!barLine) return;
+      const entered = wInputs.map((el) => el.value).filter((v) => v !== '').map(Number).filter(Number.isFinite);
+      barLine.textContent = entered.length
+        ? `${fmtW(Math.max(...entered))} on the bar = ${fmtW(Math.max(...entered) + bar)} kg lifted`
+        : `Enter plates only — the ${fmtW(bar)} kg bar is added for you`;
+    };
 
     for (let i = 0; i < Math.max(planned, sets.length); i++) {
       const cur = sets[i] || {};
@@ -272,6 +289,7 @@ function liftBody(ctx, date, day, liftKey, phase, slot = 'PM') {
         type: 'number', inputmode: 'decimal', step: '2.5', min: '0',
         placeholder: suggest != null ? fmtW(suggest) : 'kg', value: cur.weight ?? '',
       });
+      wInputs.push(wIn);
       const rIn = h('input', {
         type: 'number', inputmode: 'numeric', step: '1', min: '0',
         placeholder: String(high), value: cur.reps ?? '',
@@ -288,7 +306,10 @@ function liftBody(ctx, date, day, liftKey, phase, slot = 'PM') {
         return arr[i];
       };
 
-      wIn.addEventListener('change', () => writeSet({ weight: wIn.value === '' ? null : Number(wIn.value) }));
+      wIn.addEventListener('change', () => {
+        writeSet({ weight: wIn.value === '' ? null : Number(wIn.value) });
+        paintBar();
+      });
       rIn.addEventListener('change', () => writeSet({ reps: rIn.value === '' ? null : Number(rIn.value) }));
       dBtn.addEventListener('click', () => {
         // one-tap logging: adopt placeholder values when fields are empty
@@ -300,10 +321,15 @@ function liftBody(ctx, date, day, liftKey, phase, slot = 'PM') {
           done: !dBtn.classList.contains('on'),
         });
         dBtn.classList.toggle('on', set.done);
+        paintBar(); // the one-tap path can fill the weight field itself
         checkSessionDone();
       });
 
       exEl.append(h('div', { class: 'set-row' }, h('span', { class: 'set-n' }, String(i + 1)), wIn, rIn, dBtn));
+    }
+    if (barLine) {
+      paintBar();
+      exEl.append(barLine);
     }
     body.append(exEl);
   }

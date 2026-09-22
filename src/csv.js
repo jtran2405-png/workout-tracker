@@ -1,6 +1,6 @@
 // CSV + JSON export. Pure functions over the store document — unit tested.
 
-import { sleepHoursOf } from './program.js';
+import { sleepHoursOf, barKg, totalKg } from './program.js';
 
 function esc(v) {
   if (v == null) return '';
@@ -13,13 +13,20 @@ function row(cells) {
 }
 
 export function setsCsv(doc) {
-  const lines = [row(['date', 'slot', 'workout', 'exercise', 'set', 'weight', 'reps', 'done'])];
+  // `weight` is what went on the bar, `bar_kg` and `total_kg` say what that
+  // actually weighed — keeping the raw entry auditable instead of overwriting it.
+  const lines = [row(['date', 'slot', 'workout', 'exercise', 'set', 'weight', 'bar_kg', 'total_kg', 'reps', 'done'])];
   const keys = Object.keys(doc.sessions).sort();
   for (const key of keys) {
     const s = doc.sessions[key];
     for (const [exName, sets] of Object.entries(s.exercises || {})) {
+      const bar = barKg(exName, doc.settings);
       sets.forEach((set, i) => {
-        lines.push(row([s.date, s.slot, s.template, exName, i + 1, set.weight ?? '', set.reps ?? '', set.done ? 1 : 0]));
+        lines.push(row([
+          s.date, s.slot, s.template, exName, i + 1,
+          set.weight ?? '', bar, totalKg(set.weight, exName, doc.settings) ?? '',
+          set.reps ?? '', set.done ? 1 : 0,
+        ]));
       });
     }
   }

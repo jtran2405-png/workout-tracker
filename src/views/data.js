@@ -1,4 +1,4 @@
-import { weekNumber, phaseFor, PHASE_INFO, todayStr } from '../program.js';
+import { weekNumber, phaseFor, PHASE_INFO, todayStr, DEFAULT_BARS } from '../program.js';
 import { migrate, clearAll } from '../store.js';
 import { setsCsv, daysCsv, backupJson, download } from '../csv.js';
 import { h, toast, confirmDialog } from '../ui.js';
@@ -37,6 +37,32 @@ export function renderData(root, ctx) {
     })()),
     h('button', { class: 'btn', style: 'width:100%;margin-top:4px', onclick: () => ctx.openBaseline() },
       'Edit day-one baseline weights'),
+  ));
+
+  // ---- bar weights ----
+  // Lift logging takes plates only; these are what gets added on top. Editable
+  // because bars vary between gyms — a women's bar is 15 kg, not 20.
+  const barField = (key, label, hint) => field(label, h('input', {
+    type: 'number', inputmode: 'decimal', step: '0.5', min: '0', max: '50',
+    value: doc.settings.bars?.[key] ?? DEFAULT_BARS[key],
+    onchange: (e) => {
+      const v = e.target.value === '' ? DEFAULT_BARS[key] : Number(e.target.value);
+      doc.settings.bars = { ...DEFAULT_BARS, ...doc.settings.bars, [key]: v };
+      ctx.save();
+      ctx.refresh();
+      toast(`${label} set to ${v} kg`, 'good');
+    },
+    title: hint,
+  }));
+
+  root.append(h('div', { class: 'card' },
+    h('h2', {}, 'Bar weights'),
+    h('p', { class: 'sub', style: 'margin-bottom:12px' },
+      'You log the plates you load; the app adds the bar. Check your gym\'s bars once and correct these — a women\'s bar is 15 kg, and cheap bars run 10–15 kg.'),
+    barField('olympic', 'Straight barbell', 'Squat, bench, deadlift, RDL, hip thrust'),
+    barField('ez', 'EZ curl bar', 'EZ-bar curl'),
+    h('p', { class: 'sub', style: 'margin-top:8px' },
+      'Landmine, cable, machine, dumbbell and kettlebell work gets no bar added — the number you log is already the load.'),
   ));
 
   // ---- export ----

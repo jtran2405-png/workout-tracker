@@ -1,6 +1,7 @@
 import {
   todayStr, addDays, weekNumber, mondayOfWeek, phaseFor, LIFTS,
   setsFor, repRange, suggestNextWeight, parseDate, kgLb, sleepHoursOf,
+  barKg, totalKg,
 } from '../program.js';
 import { historyFor, lastSetsFor } from '../store.js';
 import { h, toast } from '../ui.js';
@@ -119,7 +120,17 @@ export function renderProgress(root, ctx) {
   exCard.append(sel);
 
   const hist = historyFor(doc, selected);
-  exCard.append(lineChart(hist.map((p) => ({ label: shortDate(p.date), value: p.weight })), { unit: 'kg', decimals: 1 }));
+  // chart the real weight moved, not the plate count — a 45 kg bench and a
+  // 65 kg bench are the same line otherwise, and only one of them is true
+  const bar = barKg(selected, doc.settings);
+  exCard.append(lineChart(
+    hist.map((p) => ({ label: shortDate(p.date), value: totalKg(p.weight, selected, doc.settings) })),
+    { unit: 'kg', decimals: 1 },
+  ));
+  if (bar) {
+    exCard.append(h('p', { class: 'sub', style: 'margin-top:6px' },
+      `Includes the ${bar} kg bar. You log plates; the bar is added here.`));
+  }
 
   const spec = exerciseSpec(selected);
   if (spec && hist.length) {
@@ -128,9 +139,12 @@ export function renderProgress(root, ctx) {
     const next = suggestNextWeight(prev, setsFor(spec, phase), repRange(spec, phase).high);
     if (next != null) {
       const bump = next > hist[hist.length - 1].weight;
+      // `next` is what to LOAD, so it stays in plates — that is the number he
+      // acts on at the rack; the total follows in brackets.
       exCard.append(h('p', { class: 'sub', style: 'margin-top:8px' },
         `Next session: `,
-        h('strong', { style: bump ? 'color:var(--accent)' : '' }, `${next} kg`),
+        h('strong', { style: bump ? 'color:var(--accent)' : '' },
+          `${next} kg${bar ? ` on the bar (${totalKg(next, selected, doc.settings)} kg total)` : ''}`),
         bump ? ' — all sets hit the top of the range, add 2.5 kg.' : ' — repeat, then beat the rep targets to earn +2.5 kg.'));
     }
   }
