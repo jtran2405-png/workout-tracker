@@ -197,13 +197,14 @@ export const LIFTS = {
     adhoc: true,
     exercises: [
       { name: 'WARMUP: 5–10 min easy cardio + dynamic mobility', low: 1, high: 1, sets: 1, note: 'bike/treadmill, arm circles, leg swings' },
+      // Sled over broad jumps: push-only, so little soreness before weekend sparring, and no landings on the back.
+      { name: 'Heavy sled push', low: 1, high: 1, sets: 6, unitLabel: 'trips', note: '15 m sprint, full rest ~90 s' },
       { name: 'Landmine rotational punch throws', low: 5, high: 5, sets: 4, note: 'per side, full rest, max intent' },
       { name: 'Med-ball floor slams', low: 6, high: 6, sets: 4, note: 'overhead to floor, full violence' },
       { name: 'Med-ball rotational scoop toss', low: 5, high: 5, sets: 3, note: 'per side, throw sideways, chase it' },
       { name: 'Jump squats', low: 5, high: 5, sets: 4, note: 'light DBs at sides ok, land soft' },
       { name: 'KB swings, heavy', low: 8, high: 8, sets: 4, note: 'hip snap like a teep' },
-      { name: 'Broad jumps', low: 4, high: 4, sets: 3, note: 'stick the landing (or skip if no space)' },
-      { name: 'Engine circuit (2–3 × 3 min)', low: 1, high: 1, sets: 1, unitLabel: 'rounds', note: '30s slams → 30s swings → 30s jump lunges → 30s sprawls → 60s shadowbox, 1 min rest' },
+      { name: 'Engine circuit (2–3 × 3 min)', low: 1, high: 1, sets: 1, unitLabel: 'rounds', note: '30s sled push → 30s slams → 30s sprawls → 30s swings → 60s shadowbox, 1 min rest. Keep total Z4/Z5 under ~15 min' },
     ],
   },
   UPPER_B: {
