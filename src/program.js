@@ -172,13 +172,14 @@ export const LIFTS = {
       { name: 'WARMUP: 5–10 min easy cardio (bike/treadmill)', low: 1, high: 1, sets: 1, note: 'easy pace' },
       { name: 'WARMUP: Cat-cow stretch', low: 1, high: 1, sets: 1, note: '10 reps, mobilize spine' },
       { name: 'WARMUP: Light hip thrusts', low: 10, high: 10, sets: 1, note: 'bodyweight or light, groove hips' },
-      { name: 'Med-ball rotational slam', low: 5, high: 5, sets: 3, note: 'per side — throw violently, full rest' },
       // conventional, off the floor — a trap bar would need its own bar weight
       // (they run 25–32 kg), so the template names the one Justin actually pulls
-      { name: 'Deadlift', low: 5, high: 5, main: true, note: 'conventional, off the floor', bar: 'olympic' },
-      { name: 'Hip thrust', low: 10, high: 10, bar: 'olympic' },
-      { name: 'Chest-supported row', low: 12, high: 12 },
-      { name: "Farmer's carry", low: 3, high: 3, unitLabel: 'trips' },
+      { name: 'Deadlift', low: 5, high: 5, sets: 3, main: true, note: 'conventional, off the floor; stop if the back pinches', bar: 'olympic' },
+      { name: 'DB Romanian deadlift', low: 8, high: 8, sets: 3, note: 'light, slow lowering' },
+      { name: 'Landmine row', low: 10, high: 10, sets: 3, note: 'per arm' },
+      { name: 'Barbell glute bridge', low: 12, high: 12, sets: 3, note: 'on the floor, pad the bar', bar: 'olympic' },
+      { name: 'Bird dog', low: 12, high: 12, sets: 2, note: 'bodyweight, per side' },
+      { name: 'Dead bug + side plank', low: 1, high: 1, sets: 2, unitLabel: 'rounds', note: 'bodyweight' },
     ],
   },
   ATHLETIC: {
