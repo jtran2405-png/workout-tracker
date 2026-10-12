@@ -146,8 +146,9 @@ export const LIFTS = {
       { name: 'WARMUP: Air squats', low: 10, high: 10, sets: 1, note: 'bodyweight, full range' },
       { name: 'Box jump', low: 3, high: 3, sets: 3, note: 'low box, stick the landing, full rest' },
       // back squat + barbell RDL swapped out 12 Oct 2026: lower back still sore,
-      // and the goal is leaner, not bigger. Nothing here loads the spine.
-      { name: 'Goblet squat', low: 8, high: 12, main: true, note: 'one DB at the chest, upright torso' },
+      // and the goal is leaner, not bigger. Front squat keeps a barbell but the
+      // bar sits on the front of the shoulders, so the torso stays upright.
+      { name: 'Front squat', low: 6, high: 8, main: true, note: 'bar on front delts, elbows high, to a box ok; stop if the back pinches', bar: 'olympic' },
       { name: 'Bulgarian split squat', low: 8, high: 10, note: 'per leg, DBs at sides, light' },
       { name: 'Hamstring curl', low: 10, high: 12, note: 'machine, slow lowering' },
       { name: 'Standing calf raise', low: 12, high: 12, sets: 4 },
