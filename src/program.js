@@ -145,9 +145,11 @@ export const LIFTS = {
       { name: 'WARMUP: Leg swings & hip circles', low: 1, high: 1, sets: 1, note: '10 each direction per leg' },
       { name: 'WARMUP: Air squats', low: 10, high: 10, sets: 1, note: 'bodyweight, full range' },
       { name: 'Box jump', low: 3, high: 3, sets: 3, note: 'low box, stick the landing, full rest' },
-      { name: 'Back squat', low: 6, high: 8, main: true, bar: 'olympic' },
-      { name: 'Romanian deadlift', low: 8, high: 8, bar: 'olympic' },
-      { name: 'Bulgarian split squat', low: 8, high: 8, note: 'per leg — balance under load' },
+      // back squat + barbell RDL swapped out 12 Oct 2026: lower back still sore,
+      // and the goal is leaner, not bigger. Nothing here loads the spine.
+      { name: 'Goblet squat', low: 8, high: 12, main: true, note: 'one DB at the chest, upright torso' },
+      { name: 'Bulgarian split squat', low: 8, high: 10, note: 'per leg, DBs at sides, light' },
+      { name: 'Hamstring curl', low: 10, high: 12, note: 'machine, slow lowering' },
       { name: 'Standing calf raise', low: 12, high: 12, sets: 4 },
       { name: 'Landmine rotation', low: 10, high: 10, note: 'per side, controlled' },
     ],
@@ -172,12 +174,11 @@ export const LIFTS = {
       { name: 'WARMUP: 5–10 min easy cardio (bike/treadmill)', low: 1, high: 1, sets: 1, note: 'easy pace' },
       { name: 'WARMUP: Cat-cow stretch', low: 1, high: 1, sets: 1, note: '10 reps, mobilize spine' },
       { name: 'WARMUP: Light hip thrusts', low: 10, high: 10, sets: 1, note: 'bodyweight or light, groove hips' },
-      // conventional, off the floor — a trap bar would need its own bar weight
-      // (they run 25–32 kg), so the template names the one Justin actually pulls
-      { name: 'Deadlift', low: 5, high: 5, sets: 3, main: true, note: 'conventional, off the floor; stop if the back pinches', bar: 'olympic' },
-      { name: 'DB Romanian deadlift', low: 8, high: 8, sets: 3, note: 'light, slow lowering' },
+      // deadlift + DB RDL swapped out 12 Oct 2026 for the sore lower back:
+      // hip thrust trains the same glutes/hamstrings with the spine unloaded
+      { name: 'Hip thrust', low: 8, high: 12, sets: 3, main: true, note: 'back on a bench, pad the bar, ribs down', bar: 'olympic' },
+      { name: 'Hamstring curl', low: 10, high: 12, sets: 3, note: 'machine, slow lowering' },
       { name: 'Landmine row', low: 10, high: 10, sets: 3, note: 'per arm' },
-      { name: 'Barbell glute bridge', low: 12, high: 12, sets: 3, note: 'on the floor, pad the bar', bar: 'olympic' },
       { name: 'Bird dog', low: 12, high: 12, sets: 2, note: 'bodyweight, per side' },
       { name: 'Dead bug + side plank', low: 1, high: 1, sets: 2, unitLabel: 'rounds', note: 'bodyweight' },
     ],
@@ -292,6 +293,14 @@ export const LIFTS = {
 // the lookup can never drift from the templates.
 for (const lift of Object.values(LIFTS)) {
   for (const ex of lift.exercises) if (ex.bar) BAR_BY_EXERCISE[ex.name] = ex.bar;
+}
+// Main lifts a template used to have, so reports on older weeks still show them.
+export const RETIRED_MAINS = { LOWER: ['Back squat'], POSTERIOR: ['Deadlift'] };
+
+// Barbell lifts retired from the templates still sit in logged history as
+// plates-only numbers; keep their bar so old reports and charts stay true.
+for (const name of ['Back squat', 'Romanian deadlift', 'Deadlift', 'Barbell glute bridge']) {
+  BAR_BY_EXERCISE[name] ??= 'olympic';
 }
 
 // Weekly template keyed by weekday (0=Sun..6=Sat).

@@ -268,7 +268,7 @@ describe('bar weights', () => {
   it('adds the bar to plates for barbell lifts', () => {
     // the whole point: Justin types what he loads, never a running total
     expect(totalKg(45, 'Bench press')).toBe(65);
-    expect(totalKg(60, 'Back squat')).toBe(80);
+    expect(totalKg(60, 'Hip thrust')).toBe(80);
     expect(totalKg(20, 'EZ-bar curl')).toBe(27.5);
   });
   it('adds nothing where there is no bar to add', () => {

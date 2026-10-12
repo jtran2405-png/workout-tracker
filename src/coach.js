@@ -1,7 +1,7 @@
 // Weekly coach report — a compact markdown digest to paste into Claude.
 // Pure function over the store document, unit tested.
 
-import {
+import { RETIRED_MAINS,
   addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
   slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb, RECOVERY_PROGRAM, DAILY_BASE,
   sleepHoursOf, totalKg,
@@ -93,9 +93,11 @@ export function buildCoachReport(doc, week, today = todayStr()) {
       }
       if (spec.type === 'lift') {
         const sess = doc.sessions[`${date}:${slot.toUpperCase()}`];
-        const mains = LIFTS[spec.lift].exercises.filter((e) => e.main).map((e) => {
-          const t = topSet(sess?.exercises?.[e.name], e.name, doc.settings);
-          return t ? `${e.name} ${t}` : null;
+        const mainNames = [...LIFTS[spec.lift].exercises.filter((e) => e.main).map((e) => e.name),
+          ...(RETIRED_MAINS[spec.lift] || [])];
+        const mains = mainNames.map((name) => {
+          const t = topSet(sess?.exercises?.[name], name, doc.settings);
+          return t ? `${name} ${t}` : null;
         }).filter(Boolean);
         if (mains.length) label += ` (${mains.join(', ')})`;
       }
