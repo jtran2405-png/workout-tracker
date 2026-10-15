@@ -172,13 +172,15 @@ export const LIFTS = {
   POSTERIOR: {
     title: 'Posterior · power',
     exercises: [
-      { name: 'WARMUP: 5–10 min easy cardio (bike/treadmill)', low: 1, high: 1, sets: 1, note: 'easy pace' },
+      // Thursday gym has barbell, dumbbells, kettlebells and a landmine only
+      // (Justin, 8 + 15 Oct 2026): keep every exercise to that kit
+      { name: 'WARMUP: KB halo + goblet march', low: 1, high: 1, sets: 1, note: 'light KB, 10 halos each way, then 1 min marching with it at the chest' },
       { name: 'WARMUP: Cat-cow stretch', low: 1, high: 1, sets: 1, note: '10 reps, mobilize spine' },
       { name: 'WARMUP: Light hip thrusts', low: 10, high: 10, sets: 1, note: 'bodyweight or light, groove hips' },
       // deadlift + DB RDL swapped out 12 Oct 2026 for the sore lower back:
       // hip thrust trains the same glutes/hamstrings with the spine unloaded
       { name: 'Hip thrust', low: 8, high: 12, sets: 3, main: true, note: 'back on a bench, pad the bar, ribs down', bar: 'olympic' },
-      { name: 'Hamstring curl', low: 10, high: 12, sets: 3, note: 'machine, slow lowering' },
+      { name: 'DB lying leg curl', low: 10, high: 12, sets: 3, note: 'face down on a bench, one DB between the feet, slow lowering' },
       { name: 'Landmine row', low: 10, high: 10, sets: 3, note: 'per arm' },
       { name: 'Bird dog', low: 12, high: 12, sets: 2, note: 'bodyweight, per side' },
       { name: 'Dead bug + side plank', low: 1, high: 1, sets: 2, unitLabel: 'rounds', note: 'bodyweight' },
