@@ -3,7 +3,7 @@ import {
   weekNumber, phaseFor, setsFor, repRange, suggestNextWeight,
   canLift, plungeWarning, sparringMode, WEEK_TEMPLATE, LIFTS, isLiftingDay,
   mondayOfWeek, addDays, runPace, slotsFor,
-  sleepHoursOf, DAILY_BASE, sleepFromClock,
+  sleepHoursOf, DAILY_BASE, sleepFromClock, runPlanned, WEEK_TEMPLATE_V1,
   barKg, totalKg, BAR_BY_EXERCISE, DEFAULT_BARS, DEFAULT_SETTINGS,
 } from '../src/program.js';
 
@@ -114,9 +114,20 @@ describe('day rules', () => {
     expect(runPace(null, 21)).toBeNull();
     expect(runPace(3.14, null)).toBeNull();
   });
-  it('Wednesday template has no lift slot', () => {
-    expect(WEEK_TEMPLATE[3].pm.type).toBe('recovery');
-    expect(WEEK_TEMPLATE[3].am.type).toBe('cardio');
+  it('Monday is the rest day: no lift, no run, recovery program only', () => {
+    expect(WEEK_TEMPLATE[1].rest).toBe(true);
+    expect(WEEK_TEMPLATE[1].am).toBeNull();
+    expect(WEEK_TEMPLATE[1].pm.program).toBe(true);
+    expect(isLiftingDay('2026-10-26')).toBe(false);
+    expect(runPlanned('2026-10-26')).toBe(false);
+    expect(runPlanned('2026-10-27')).toBe(true);
+  });
+  it('weeks before the switch keep the old split (lifts Mon/Tue/Thu, Wednesday recovery)', () => {
+    expect(slotsFor('2026-10-19').am.lift).toBe('LOWER');
+    expect(slotsFor('2026-10-20').am.lift).toBe('UPPER_A');
+    expect(slotsFor('2026-10-21').pm.program).toBe(true);
+    expect(runPlanned('2026-10-19')).toBe(true);
+    expect(WEEK_TEMPLATE_V1[3].am.type).toBe('cardio');
   });
   it('Sunday sparring is technical weeks 1–4, live from week 5', () => {
     expect(sparringMode(4)).toBe('technical');
@@ -164,8 +175,8 @@ describe('sleep from the clock pickers', () => {
 
 describe('template shape', () => {
   it('four AM lift slots: three strength days plus Friday conditioning', () => {
-    expect(WEEK_TEMPLATE[1].am.lift).toBe('LOWER');
-    expect(WEEK_TEMPLATE[2].am.lift).toBe('UPPER_A');
+    expect(WEEK_TEMPLATE[2].am.lift).toBe('LOWER');
+    expect(WEEK_TEMPLATE[3].am.lift).toBe('UPPER_A');
     expect(WEEK_TEMPLATE[4].am.lift).toBe('POSTERIOR');
     expect(WEEK_TEMPLATE[5].am.lift).toBe('CONDITIONING');
   });
@@ -213,7 +224,7 @@ describe('template shape', () => {
   it('every lift day carries a PM slot, and none of them is a second Z2 block', () => {
     // Stripping the duplicate Z2 left Thursday with no PM at all while Mon and
     // Tue kept theirs; it now gets mobility aimed at what a deadlift day loads.
-    const liftDays = [1, 2, 4];
+    const liftDays = [2, 3, 4];
     for (const wd of liftDays) {
       expect(WEEK_TEMPLATE[wd].am.type, `weekday ${wd}`).toBe('lift');
       expect(WEEK_TEMPLATE[wd].pm, `weekday ${wd} PM`).not.toBeNull();

@@ -1,7 +1,7 @@
 // Accountability mechanics — pure functions, unit tested.
 // No-zero-day: any completed slot or extra session keeps the chain alive.
 
-import { addDays, todayStr, slotsFor, mondayOfWeek, sleepHoursOf, DAILY_BASE } from './program.js';
+import { addDays, todayStr, slotsFor, mondayOfWeek, sleepHoursOf, DAILY_BASE, runPlanned } from './program.js';
 
 export function isNonZeroDay(day, date = null, doc = null) {
   if (!!day && (day.amDone || day.pmDone || day.runDone || (day.extras || []).length > 0)) return true;
@@ -64,11 +64,11 @@ export function weekAdherence(doc, week, today = todayStr()) {
     if (doc.settings.startDate && date < doc.settings.startDate) continue; // before day one
     const tpl = slotsFor(date);
     const day = doc.days[date];
-    // the daily 5k Z2 base run is planned every day, on top of the weekday template
+    // the daily 5k Z2 base run is planned every non-rest day, on top of the weekday template
     const planForDay = [
       [tpl.am, !!day?.amDone],
       [tpl.pm, !!day?.pmDone],
-      [DAILY_BASE, !!day?.runDone],
+      [runPlanned(date) ? DAILY_BASE : null, !!day?.runDone],
     ];
     for (const [spec, isDone] of planForDay) {
       if (!spec) continue;

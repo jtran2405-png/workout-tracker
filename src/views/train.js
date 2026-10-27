@@ -5,7 +5,7 @@ import {
   todayStr, addDays, weekdayOf, weekNumber, phaseFor, PHASE_INFO, DAY_NAMES,
   slotsFor, LIFTS, setsFor, repRange, repTargetLabel, suggestNextWeight,
   sparringMode, parseDate, runPace, RECOVERY_PROGRAM, sleepHoursOf, DAILY_BASE, isLiftingDay,
-  barKg,
+  barKg, runPlanned,
 } from '../program.js';
 import { getDay, getSession, sessionKey, lastSetsFor } from '../store.js';
 import { h, toast, nowTime } from '../ui.js';
@@ -66,8 +66,8 @@ export function renderTrain(root, ctx) {
     ));
   }
 
-  // daily 5k Z2 base run — runs every day, independent of the weekday template
-  root.append(slotCard(ctx, date, day, 'RUN', DAILY_BASE, week, phase));
+  // daily 5k Z2 base run — every day except the rest day
+  if (runPlanned(date)) root.append(slotCard(ctx, date, day, 'RUN', DAILY_BASE, week, phase));
 
   root.append(adhocCard(ctx, date, day, phase));
   root.append(extrasCard(ctx, date, day));
@@ -143,9 +143,9 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
     }
     card.append(liftBody(ctx, date, day, spec.lift, phase, slot));
     card.append(h('p', { class: 'sub', style: 'margin-top:12px' }, '→ sauna after (always fine post-lift)'));
-  } else if (spec.type === 'recovery' && weekdayOf(date) === 3) {
+  } else if (spec.program) {
     card.append(
-      h('p', { class: 'sub', style: 'margin-bottom:10px' }, 'Hard no-lift day. Tick them off — recovery is training too.'),
+      h('p', { class: 'sub', style: 'margin-bottom:10px' }, 'Rest day: no lift, no run. Tick them off — recovery is training too.'),
       recoveryChecklist(ctx, day),
     );
   } else if (spec.type === 'freestyle') {

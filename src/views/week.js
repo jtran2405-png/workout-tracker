@@ -1,6 +1,6 @@
 import {
   todayStr, addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
-  slotsFor, LIFTS, repTargetLabel, sparringMode, parseDate, DAY_ABBR, weekdayOf, DAILY_BASE,
+  slotsFor, LIFTS, repTargetLabel, sparringMode, parseDate, DAY_ABBR, weekdayOf, DAILY_BASE, runPlanned,
 } from '../program.js';
 import { h } from '../ui.js';
 
@@ -61,7 +61,7 @@ export function renderWeek(root, ctx) {
       h('div', { class: 'wd-slots' },
         slotLine('AM', tpl.am, day?.amDone),
         slotLine('PM', tpl.pm, day?.pmDone),
-        slotLine('RUN', DAILY_BASE, day?.runDone), // planned every day
+        runPlanned(date) ? slotLine('RUN', DAILY_BASE, day?.runDone) : null, // planned every non-rest day
         ...(day?.extras || []).map((x) => h('div', { class: 'wd-slot' },
           h('span', { class: 'tag' }, '＋'),
           h('span', { class: 'dot done' }),
@@ -77,7 +77,7 @@ export function renderWeek(root, ctx) {
   // the daily run is not in WEEK_TEMPLATE, so name it once up top or the split
   // reads as if aerobic work were missing from the program entirely
   split.append(h('p', { class: 'sub', style: 'margin:-4px 2px 10px' },
-    `Every day: ${DAILY_BASE.label}. On top of that:`));
+    `Every day except Monday (rest): ${DAILY_BASE.label}. On top of that:`));
   const dayOrder = [1, 2, 3, 4, 5, 6, 0];
   for (const wd of dayOrder) {
     const tpl = { ...slotsFor(addDays(monday, dayOrder.indexOf(wd))) };
@@ -110,6 +110,6 @@ export function renderWeek(root, ctx) {
     }
   }
   split.append(h('p', { class: 'sub', style: 'margin-top:10px' },
-    'Rules: Wed = hard no-lift. No two-a-day lifting. Cold plunge only Wed + after Sat sparring. Sauna after lifting is always fine.'));
+    'Rules: Mon = rest, no lift, no run. No two-a-day lifting. Cold plunge only Mon + after Sat sparring. Sauna after lifting is always fine.'));
   root.append(split);
 }

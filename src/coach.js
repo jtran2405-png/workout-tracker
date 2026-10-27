@@ -4,7 +4,7 @@
 import { RETIRED_MAINS,
   addDays, weekNumber, mondayOfWeek, phaseFor, PHASE_INFO,
   slotsFor, LIFTS, DAY_ABBR, weekdayOf, todayStr, runPace, kgLb, RECOVERY_PROGRAM, DAILY_BASE,
-  sleepHoursOf, totalKg,
+  sleepHoursOf, totalKg, runPlanned,
 } from './program.js';
 import { currentStreak, weekAdherence, dailies } from './grit.js';
 
@@ -87,7 +87,7 @@ export function buildCoachReport(doc, week, today = todayStr()) {
       if (!spec) continue;
       const isDone = slot === 'am' ? d?.amDone : d?.pmDone;
       let label = spec.type === 'lift' ? `${LIFTS[spec.lift].title} lift` : spec.label;
-      if (spec.type === 'recovery' && weekdayOf(date) === 3) {
+      if (spec.program) {
         const on = RECOVERY_PROGRAM.filter((item) => (item.store === 'recovery' ? d?.recovery?.[item.key] : d?.recoveryChecks?.[item.key])).length;
         label += ` (program ${on}/${RECOVERY_PROGRAM.length})`;
       }
@@ -103,8 +103,8 @@ export function buildCoachReport(doc, week, today = todayStr()) {
       }
       parts.push(`${slot.toUpperCase()} ${isDone ? '✓' : '✗'} ${label}`);
     }
-    // the daily base run is planned every day, so it shows on every day's line
-    parts.push(`RUN ${d?.runDone ? '✓' : '✗'} ${DAILY_BASE.label}`);
+    // the daily base run is planned every non-rest day, so it shows on those days' lines
+    if (runPlanned(date) || d?.runDone) parts.push(`RUN ${d?.runDone ? '✓' : '✗'} ${DAILY_BASE.label}`);
     const xt = doc.sessions[`${date}:XT`];
     const xtTitle = xt ? LIFTS[xt.template].title : null;
     if (xt) {
