@@ -105,8 +105,9 @@ describe('day rules', () => {
     expect(plungeWarning('2026-08-22', day, null)).toBeTruthy();
     expect(plungeWarning('2026-08-22', { extras: [{ type: 'Cardio' }] }, { sessions: {} })).toBeNull();
   });
-  it('Saturday is a freestyle slot', () => {
-    expect(WEEK_TEMPLATE[6].am.type).toBe('freestyle');
+  it('Saturday is sparring from 9 Nov (freestyle before)', () => {
+    expect(WEEK_TEMPLATE[6].pm.type).toBe('sparring');
+    expect(slotsFor('2026-11-07').am.type).toBe('freestyle');
   });
   it('run pace formats mm:ss per km', () => {
     expect(runPace(3.14, 21)).toBe('6:41/km');
@@ -114,10 +115,22 @@ describe('day rules', () => {
     expect(runPace(null, 21)).toBeNull();
     expect(runPace(3.14, null)).toBeNull();
   });
-  it('Monday is the rest day: no lift, no run, recovery program only', () => {
-    expect(WEEK_TEMPLATE[1].rest).toBe(true);
-    expect(WEEK_TEMPLATE[1].am).toBeNull();
-    expect(WEEK_TEMPLATE[1].pm.program).toBe(true);
+  it('Sunday is the rest day from 9 Nov: no lift, no run, recovery program only', () => {
+    expect(WEEK_TEMPLATE[0].rest).toBe(true);
+    expect(WEEK_TEMPLATE[0].am).toBeNull();
+    expect(WEEK_TEMPLATE[0].pm.program).toBe(true);
+    expect(runPlanned('2026-11-15')).toBe(false);
+    expect(runPlanned('2026-11-09')).toBe(true);
+    expect(slotsFor('2026-11-09').am.lift).toBe('LOWER');
+    expect(slotsFor('2026-11-10').am.lift).toBe('UPPER_A');
+    expect(slotsFor('2026-11-11').am.type).toBe('cardio');
+    expect(slotsFor('2026-11-12').am.lift).toBe('POSTERIOR');
+    expect(slotsFor('2026-11-14').pm.type).toBe('sparring');
+  });
+  it('26 Oct to 8 Nov keep the Monday rest split', () => {
+    expect(slotsFor('2026-11-02').rest).toBe(true);
+    expect(slotsFor('2026-11-03').am.lift).toBe('LOWER');
+    expect(slotsFor('2026-11-08').pm.type).toBe('sparring');
     expect(isLiftingDay('2026-10-26')).toBe(false);
     expect(runPlanned('2026-10-26')).toBe(false);
     expect(runPlanned('2026-10-27')).toBe(true);
@@ -175,8 +188,8 @@ describe('sleep from the clock pickers', () => {
 
 describe('template shape', () => {
   it('four AM lift slots: three strength days plus Friday conditioning', () => {
-    expect(WEEK_TEMPLATE[2].am.lift).toBe('LOWER');
-    expect(WEEK_TEMPLATE[3].am.lift).toBe('UPPER_A');
+    expect(WEEK_TEMPLATE[1].am.lift).toBe('LOWER');
+    expect(WEEK_TEMPLATE[2].am.lift).toBe('UPPER_A');
     expect(WEEK_TEMPLATE[4].am.lift).toBe('POSTERIOR');
     expect(WEEK_TEMPLATE[5].am.lift).toBe('CONDITIONING');
   });
@@ -224,7 +237,7 @@ describe('template shape', () => {
   it('every lift day carries a PM slot, and none of them is a second Z2 block', () => {
     // Stripping the duplicate Z2 left Thursday with no PM at all while Mon and
     // Tue kept theirs; it now gets mobility aimed at what a deadlift day loads.
-    const liftDays = [2, 3, 4];
+    const liftDays = [1, 2, 4];
     for (const wd of liftDays) {
       expect(WEEK_TEMPLATE[wd].am.type, `weekday ${wd}`).toBe('lift');
       expect(WEEK_TEMPLATE[wd].pm, `weekday ${wd} PM`).not.toBeNull();

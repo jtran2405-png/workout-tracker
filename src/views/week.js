@@ -44,7 +44,7 @@ export function renderWeek(root, ctx) {
       if (done) cls += ' done';
       else if (date < today) cls += ' missed';
       let label = spec.type === 'lift' ? `${LIFTS[spec.lift].title} lift` : spec.label;
-      if (spec.type === 'sparring' && weekdayOf(date) === 0) {
+      if (spec.type === 'sparring') {
         label += sparringMode(week) === 'live' ? ' · LIVE' : ' · technical';
       }
       return h('div', { class: 'wd-slot' }, h('span', { class: 'tag' }, tag), h('span', { class: cls }), label);
@@ -77,7 +77,7 @@ export function renderWeek(root, ctx) {
   // the daily run is not in WEEK_TEMPLATE, so name it once up top or the split
   // reads as if aerobic work were missing from the program entirely
   split.append(h('p', { class: 'sub', style: 'margin:-4px 2px 10px' },
-    `Every day except Monday (rest): ${DAILY_BASE.label}. On top of that:`));
+    `Every day except Sunday (rest): ${DAILY_BASE.label}. On top of that:`));
   const dayOrder = [1, 2, 3, 4, 5, 6, 0];
   for (const wd of dayOrder) {
     const tpl = { ...slotsFor(addDays(monday, dayOrder.indexOf(wd))) };

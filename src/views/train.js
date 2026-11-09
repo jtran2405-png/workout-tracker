@@ -159,7 +159,7 @@ function slotCard(ctx, date, day, slot, spec, week, phase) {
     );
   } else if (spec.type === 'sparring') {
     const mode = sparringMode(week);
-    if (weekdayOf(date) === 0) {
+    {
       card.append(h('div', { style: 'margin-bottom:8px' },
         h('span', { class: `chip ${mode === 'live' ? 'chip-warn' : 'chip-accent'}` }, mode === 'live' ? 'LIVE sparring' : 'Technical only')));
     }

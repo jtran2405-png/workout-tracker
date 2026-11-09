@@ -130,7 +130,7 @@ export const PHASE_INFO = {
   build:    { label: 'Build',    cue: 'Last set close to failure. Main lifts move to heavier 4–6 rep work.' },
 };
 
-// Sunday sparring: technical only weeks 1–4, live from week 5.
+// Sparring: technical only weeks 1–4, live from week 5.
 export function sparringMode(week) {
   return week >= 5 ? 'live' : 'technical';
 }
@@ -307,18 +307,28 @@ for (const name of ['Back squat', 'Romanian deadlift', 'Deadlift', 'Barbell glut
 }
 
 // Weekly template keyed by weekday (0=Sun..6=Sat).
-// Fighter-first program: 3 lifts/wk (Tue/Wed/Thu) + hard conditioning (Fri) + sparring (Sat/Sun).
-// Monday is the rest day (from 26 Oct 2026): recovery program only, no daily run.
+// Fighter-first program: 3 lifts/wk (Mon/Tue/Thu) + hard conditioning (Fri) + sparring (Sat).
+// Sunday is the rest day (from 9 Nov 2026): recovery program only, no daily run.
 // Lifts run in the AM (Justin's preference); PM slots carry mobility/skill work.
-// All three lift days carry one: Tue and Thu mobility, Wed light bag work.
 // Zone 2 is NOT duplicated here — it lives in DAILY_BASE, which runs every non-rest day.
-// HCMC heat rule: early morning for outdoor work; evening indoor Z2 ok.
 export const WEEK_TEMPLATE = {
-  1: { rest: true, am: null,                                     pm: { type: 'recovery', label: 'Rest day · recovery program', program: true } },
-  2: { am: { type: 'lift', lift: 'LOWER', after: 'sauna' },      pm: { type: 'cardio', label: 'Mobility + stretch (evening ok)' } },
-  3: { am: { type: 'lift', lift: 'UPPER_A', after: 'sauna' },    pm: { type: 'cardio', label: 'Light bag work · 25 min' } },
+  0: { rest: true, am: null,                                     pm: { type: 'recovery', label: 'Rest day · recovery program', program: true } },
+  1: { am: { type: 'lift', lift: 'LOWER', after: 'sauna' },      pm: { type: 'cardio', label: 'Mobility + stretch (evening ok)' } },
+  2: { am: { type: 'lift', lift: 'UPPER_A', after: 'sauna' },    pm: { type: 'cardio', label: 'Light bag work · 25 min' } },
+  3: { am: { type: 'cardio', label: 'Incline walk 30 min · 10–12% · easy' }, pm: { type: 'cardio', label: 'Mobility + stretch (evening ok)' } },
   4: { am: { type: 'lift', lift: 'POSTERIOR', after: 'sauna' },  pm: { type: 'cardio', label: 'Mobility + stretch (hips + hamstrings)' } },
   5: { am: { type: 'lift', lift: 'CONDITIONING' },                pm: null },
+  6: { am: null,                                                 pm: { type: 'sparring', label: 'Sparring' } },
+};
+
+// 26 Oct to 8 Nov 2026: Monday rest, lifts Tue/Wed/Thu, freestyle Sat, sparring Sun.
+export const REST_SUNDAY_FROM = '2026-11-09';
+export const WEEK_TEMPLATE_V2 = {
+  1: { rest: true, am: null,                                     pm: { type: 'recovery', label: 'Rest day · recovery program', program: true } },
+  2: WEEK_TEMPLATE[1],
+  3: WEEK_TEMPLATE[2],
+  4: WEEK_TEMPLATE[4],
+  5: WEEK_TEMPLATE[5],
   6: { am: { type: 'freestyle', label: 'Freestyle — spar / lift / Zone 2' }, pm: { type: 'recovery', label: 'Cold plunge (skip if you lifted)' } },
   0: { am: null,                                                 pm: { type: 'sparring', label: 'Sparring' } },
 };
@@ -327,9 +337,9 @@ export const WEEK_TEMPLATE = {
 // Weeks before REST_MONDAY_FROM keep it so old reports and adherence stay true.
 export const REST_MONDAY_FROM = '2026-10-26';
 export const WEEK_TEMPLATE_V1 = {
-  ...WEEK_TEMPLATE,
-  1: WEEK_TEMPLATE[2],
-  2: WEEK_TEMPLATE[3],
+  ...WEEK_TEMPLATE_V2,
+  1: WEEK_TEMPLATE_V2[2],
+  2: WEEK_TEMPLATE_V2[3],
   3: { am: { type: 'cardio', label: 'Incline walk 30 min · 10–12% · easy' }, pm: { type: 'recovery', label: 'Recovery program', program: true } },
 };
 
@@ -350,7 +360,8 @@ export const DAILY_BASE = {
 };
 
 export function slotsFor(dateStr) {
-  const tpl = dateStr < REST_MONDAY_FROM ? WEEK_TEMPLATE_V1 : WEEK_TEMPLATE;
+  const tpl = dateStr < REST_MONDAY_FROM ? WEEK_TEMPLATE_V1
+    : dateStr < REST_SUNDAY_FROM ? WEEK_TEMPLATE_V2 : WEEK_TEMPLATE;
   return tpl[weekdayOf(dateStr)];
 }
 
@@ -366,13 +377,13 @@ export function isLiftingDay(dateStr) {
   return t.am?.type === 'lift' || t.pm?.type === 'lift';
 }
 
-// Monday is the rest day; weekends have no lift slot either.
+// Only the template's lift slots count (Mon/Tue/Thu lifts + Fri conditioning).
 export function canLift(dateStr) {
   return isLiftingDay(dateStr);
 }
 
 // Cold plunge blunts adaptation within ~4h of lifting → warn on lifting days.
-// Plunge is fine on the rest day and after Sat sparring.
+// Plunge is fine on the rest day and after sparring.
 // `day`/`doc` are optional: when given, ad-hoc lifts (XT sessions, extras
 // of type Lift) trigger the warning too — e.g. a freestyle-Saturday chest day.
 export function plungeWarning(dateStr, day = null, doc = null) {
