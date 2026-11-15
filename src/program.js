@@ -192,7 +192,7 @@ export const LIFTS = {
     exercises: [
       { name: 'Med-ball chest pass', low: 5, high: 5, sets: 3, note: 'explosive intent, full rest' },
       { name: 'Landmine punch press', low: 6, high: 6, main: true, note: 'per side, fight stance' },
-      { name: 'Sled push', low: 1, high: 1, sets: 6, unitLabel: 'trips', note: '20 m, fast, walk-back rest' },
+      { name: 'Hill sprint', low: 1, high: 1, sets: 6, unitLabel: 'sprints', note: '8-10 s up a steep hill, walk-back rest (replaces sled push, no sled in Da Lat)' },
       { name: 'Med-ball rotational slam', low: 8, high: 8, note: 'per side' },
       { name: 'Chin-up', low: 6, high: 8 },
     ],
@@ -202,14 +202,14 @@ export const LIFTS = {
     adhoc: true,
     exercises: [
       { name: 'WARMUP: 5–10 min easy cardio + dynamic mobility', low: 1, high: 1, sets: 1, note: 'bike/treadmill, arm circles, leg swings' },
-      // Sled over broad jumps: push-only, so little soreness before weekend sparring, and no landings on the back.
-      { name: 'Heavy sled push', low: 1, high: 1, sets: 6, unitLabel: 'trips', note: '15 m sprint, full rest ~90 s' },
+      // No sled at the Da Lat gym (15 Nov 2026): hill sprints keep the push-only, low-soreness, no-landing profile.
+      { name: 'Hill sprint', low: 1, high: 1, sets: 6, unitLabel: 'sprints', note: '8-10 s up a steep hill, full rest ~90 s (treadmill at max incline if no hill)' },
       { name: 'Landmine rotational punch throws', low: 5, high: 5, sets: 4, note: 'per side, full rest, max intent' },
       { name: 'Med-ball floor slams', low: 6, high: 6, sets: 4, note: 'overhead to floor, full violence' },
       { name: 'Med-ball rotational scoop toss', low: 5, high: 5, sets: 3, note: 'per side, throw sideways, chase it' },
       { name: 'Jump squats', low: 5, high: 5, sets: 4, note: 'light DBs at sides ok, land soft' },
       { name: 'KB swings, heavy', low: 8, high: 8, sets: 4, note: 'hip snap like a teep' },
-      { name: 'Engine circuit (2–3 × 3 min)', low: 1, high: 1, sets: 1, unitLabel: 'rounds', note: '30s sled push → 30s slams → 30s sprawls → 30s swings → 60s shadowbox, 1 min rest. Keep total Z4/Z5 under ~15 min' },
+      { name: 'Engine circuit (2–3 × 3 min)', low: 1, high: 1, sets: 1, unitLabel: 'rounds', note: '30s DB thrusters → 30s slams → 30s sprawls → 30s swings → 60s shadowbox, 1 min rest. Keep total Z4/Z5 under ~15 min' },
     ],
   },
   UPPER_B: {
